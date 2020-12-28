@@ -72,19 +72,30 @@ stringbuilder_reset(StringBuilder *sb) {
     sb->string[0] = '\0';
 }
 
-bool
-stringbuilder_insert(StringBuilder *sb, size_t position, char *string) {
-  const size_t len = strlen(string);
-  if (ensure_space(sb, len)) {
-    if (position != sb->length) {
-      memmove(&sb->string[position + len], &sb->string[position], (sb->length - position) * sizeof *sb->string);
+extern bool
+stringbuilder_insertl(StringBuilder *sb, size_t position, size_t length, char *string) {
+  if (ensure_space(sb, length)) {
+    if (position > sb->length) {
+      return false;
+    } else if (position < sb->length) {
+      memmove(&sb->string[position + length], &sb->string[position], (sb->length - position) * sizeof *sb->string);
     }
-    memcpy(&sb->string[position], string, len * sizeof *string);
-    sb->length += len;
+    memcpy(&sb->string[position], string, length * sizeof *string);
+    sb->length += length;
     sb->string[sb->length] = '\0';
     return true;
   }
   return false;
+}
+
+extern bool
+stringbuilder_appendl(StringBuilder *sb, char *string, size_t length) {
+  return stringbuilder_insertl(sb, sb->length, length, string);
+}
+
+bool
+stringbuilder_insert(StringBuilder *sb, size_t position, char *string) {
+  return stringbuilder_insertl(sb, position, strlen(string), string);
 }
 
 bool
@@ -124,19 +135,17 @@ stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...) {
   va_list args;
   char buffer[65536];
   va_start(args, format);
-  int printed = vsnprintf(buffer, sizeof buffer - 1, format, args);
+  int printed = vsnprintf(buffer, sizeof buffer, format, args);
   va_end(args);
-  if (printed < sizeof buffer - 1) {
-    buffer[printed] = '\0';
-    return stringbuilder_insert(sb, position, buffer);
+  if (printed < sizeof buffer) {
+    return stringbuilder_insertl(sb, position, printed, buffer);
   } else {
-    char *string = malloc((printed + 10) * sizeof *string);
+    char *string = malloc((printed + 1) * sizeof *string);
     if (string) {
       va_start(args, format);
       printed = vsnprintf(string, printed + 1, format, args);
       va_end(args);
-      string[printed] = '\0';
-      bool succeeded = stringbuilder_insert(sb, position, string);
+      bool succeeded = stringbuilder_insertl(sb, position, printed, string);
       free(string);
       return succeeded;
     }
@@ -146,7 +155,7 @@ stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...) {
 
 bool
 stringbuilder_insert_sb(StringBuilder *dest, size_t position, StringBuilder *src) {
-  return stringbuilder_insert(dest, position, src->string);
+  return stringbuilder_insertl(dest, position, src->length, src->string);
 }
 
 bool
@@ -167,7 +176,7 @@ stringbuilder_to_string(StringBuilder *sb) {
   return string;
 }
 
-char *
+const char *
 stringbuilder_string(StringBuilder *sb) {
   return sb->string;
 }

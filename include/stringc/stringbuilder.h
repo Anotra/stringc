@@ -11,7 +11,11 @@ stringbuilder_create();
 extern void
 stringbuilder_destroy(StringBuilder *sb);
 
-extern char *
+/**
+ * this pointer should be discarded after any changes made to the stringbuilder
+ * @return internal string
+ */
+extern const char *
 stringbuilder_string(StringBuilder *sb);
 
 extern char *
@@ -30,6 +34,9 @@ extern bool
 stringbuilder_insert(StringBuilder *sb, size_t position, char *string);
 
 extern bool
+stringbuilder_insertl(StringBuilder *sb, size_t position, size_t length, char *string);
+
+extern bool
 stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...);
 
 extern bool
@@ -37,6 +44,9 @@ stringbuilder_insert_sb(StringBuilder *dest, size_t position, StringBuilder *src
 
 extern bool
 stringbuilder_append(StringBuilder *sb, char *string);
+
+extern bool
+stringbuilder_appendl(StringBuilder *sb, char *string, size_t length);
 
 extern bool
 stringbuilder_appendf(StringBuilder *sb, char *format, ...);
