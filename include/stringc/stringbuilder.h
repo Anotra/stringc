@@ -34,7 +34,7 @@ extern bool
 stringbuilder_insert(StringBuilder *sb, size_t position, char *string);
 
 extern bool
-stringbuilder_insertl(StringBuilder *sb, size_t position, size_t length, char *string);
+stringbuilder_insertl(StringBuilder *sb, size_t position, char *string, size_t length);
 
 extern bool
 stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...);

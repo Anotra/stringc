@@ -73,7 +73,7 @@ stringbuilder_reset(StringBuilder *sb) {
 }
 
 extern bool
-stringbuilder_insertl(StringBuilder *sb, size_t position, size_t length, char *string) {
+stringbuilder_insertl(StringBuilder *sb, size_t position, char *string, size_t length) {
   if (ensure_space(sb, length)) {
     if (position > sb->length) {
       return false;
@@ -90,12 +90,12 @@ stringbuilder_insertl(StringBuilder *sb, size_t position, size_t length, char *s
 
 extern bool
 stringbuilder_appendl(StringBuilder *sb, char *string, size_t length) {
-  return stringbuilder_insertl(sb, sb->length, length, string);
+  return stringbuilder_insertl(sb, sb->length, string, length);
 }
 
 bool
 stringbuilder_insert(StringBuilder *sb, size_t position, char *string) {
-  return stringbuilder_insertl(sb, position, strlen(string), string);
+  return stringbuilder_insertl(sb, position, string, strlen(string));
 }
 
 bool
@@ -138,14 +138,14 @@ stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...) {
   int printed = vsnprintf(buffer, sizeof buffer, format, args);
   va_end(args);
   if (printed < sizeof buffer) {
-    return stringbuilder_insertl(sb, position, printed, buffer);
+    return stringbuilder_insertl(sb, position, buffer, printed);
   } else {
     char *string = malloc((printed + 1) * sizeof *string);
     if (string) {
       va_start(args, format);
       printed = vsnprintf(string, printed + 1, format, args);
       va_end(args);
-      bool succeeded = stringbuilder_insertl(sb, position, printed, string);
+      bool succeeded = stringbuilder_insertl(sb, position, string, printed);
       free(string);
       return succeeded;
     }
@@ -155,7 +155,7 @@ stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...) {
 
 bool
 stringbuilder_insert_sb(StringBuilder *dest, size_t position, StringBuilder *src) {
-  return stringbuilder_insertl(dest, position, src->length, src->string);
+  return stringbuilder_insertl(dest, position, src->string, src->length);
 }
 
 bool
