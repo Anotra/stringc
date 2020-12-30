@@ -25,7 +25,7 @@ stringbuilder_destroy(StringBuilder *sb) {
 }
 
 static bool
-ensure_space(StringBuilder *sb, size_t space_needed) {
+ensure_space(StringBuilder *sb, const size_t space_needed) {
   if (!sb->string) {
     size_t capacity = space_needed < 64 ? 64 : space_needed;
     sb->string = malloc((capacity + 1) * sizeof *sb->string);
@@ -56,7 +56,7 @@ stringbuilder_length(StringBuilder *sb) {
 }
 
 bool
-stringbuilder_set_length(StringBuilder *sb, size_t length) {
+stringbuilder_set_length(StringBuilder *sb, const size_t length) {
   if (sb->length >= length) {
     sb->length = length;
     sb->string[sb->length] = '\0';
@@ -73,7 +73,7 @@ stringbuilder_reset(StringBuilder *sb) {
 }
 
 extern bool
-stringbuilder_insertl(StringBuilder *sb, size_t position, char *string, size_t length) {
+stringbuilder_insertl(StringBuilder *sb, const size_t position, const char *string, const size_t length) {
   if (ensure_space(sb, length)) {
     if (position > sb->length) {
       return false;
@@ -89,22 +89,22 @@ stringbuilder_insertl(StringBuilder *sb, size_t position, char *string, size_t l
 }
 
 extern bool
-stringbuilder_appendl(StringBuilder *sb, char *string, size_t length) {
+stringbuilder_appendl(StringBuilder *sb, const char *string, const size_t length) {
   return stringbuilder_insertl(sb, sb->length, string, length);
 }
 
 bool
-stringbuilder_insert(StringBuilder *sb, size_t position, char *string) {
+stringbuilder_insert(StringBuilder *sb, const size_t position, const char *string) {
   return stringbuilder_insertl(sb, position, string, strlen(string));
 }
 
 bool
-stringbuilder_append(StringBuilder *sb, char *string) {
+stringbuilder_append(StringBuilder *sb, const char *string) {
   return stringbuilder_insert(sb, sb->length, string);
 }
 
 bool
-stringbuilder_appendf(StringBuilder *sb, char *format, ...) {
+stringbuilder_appendf(StringBuilder *sb, const char *format, ...) {
   int printed = 0;
   va_list args;
   if (ensure_space(sb, 0)) {
@@ -131,7 +131,7 @@ stringbuilder_appendf(StringBuilder *sb, char *format, ...) {
 }
 
 bool
-stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...) {
+stringbuilder_insertf(StringBuilder *sb, const size_t position, const char *format, ...) {
   va_list args;
   char buffer[65536];
   va_start(args, format);
@@ -154,12 +154,12 @@ stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...) {
 }
 
 bool
-stringbuilder_insert_sb(StringBuilder *dest, size_t position, StringBuilder *src) {
+stringbuilder_insert_sb(StringBuilder *dest, const size_t position, const StringBuilder *src) {
   return stringbuilder_insertl(dest, position, src->string, src->length);
 }
 
 bool
-stringbuilder_append_sb(StringBuilder *dest, StringBuilder *src) {
+stringbuilder_append_sb(StringBuilder *dest, const StringBuilder *src) {
   return stringbuilder_insert_sb(dest, dest->length, src);
 }
 

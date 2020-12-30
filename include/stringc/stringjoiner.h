@@ -6,19 +6,22 @@
 typedef struct stringjoiner StringJoiner;
 
 extern StringJoiner *
-stringjoiner_create(char *prefix, char *delimiter, char *suffix, char *empty);
+stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty);
 
 extern void
 stringjoiner_destroy(StringJoiner *sj);
+
+extern void
+stringjoiner_reset(StringJoiner *sj);
 
 extern char *
 stringjoiner_to_string(StringJoiner *sj);
 
 extern bool
-stringjoiner_add(StringJoiner *sj, char *string);
+stringjoiner_add(StringJoiner *sj, const char *string);
 
 extern bool
-stringjoiner_addf(StringJoiner *sj, char *format, ...);
+stringjoiner_addf(StringJoiner *sj, const char *format, ...);
 
 
 #endif//STRINGC_STRINGJOINER_H

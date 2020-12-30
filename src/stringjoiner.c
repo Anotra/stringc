@@ -15,7 +15,7 @@ struct stringjoiner {
 };
 
 StringJoiner *
-stringjoiner_create(char *prefix, char *delimiter, char *suffix, char *empty) {
+stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty) {
   StringJoiner *sj = calloc(1, sizeof *sj);
   if (sj) {
     if (sj->sb = stringbuilder_create()) {
@@ -66,7 +66,7 @@ stringjoiner_to_string(StringJoiner *sj) {
 }
 
 bool
-stringjoiner_add(StringJoiner *sj, char *string) {
+stringjoiner_add(StringJoiner *sj, const char *string) {
   const size_t length = stringbuilder_length(sj->sb);
   char *str_to_add = (length == 0) ? sj->prefix : sj->delimiter;
   if (str_to_add && !stringbuilder_append(sj->sb, str_to_add))
@@ -80,7 +80,7 @@ stringjoiner_add(StringJoiner *sj, char *string) {
 }
 
 bool
-stringjoiner_addf(StringJoiner *sj, char *format, ...) {
+stringjoiner_addf(StringJoiner *sj, const char *format, ...) {
   va_list args;
   char buffer[65536];
   va_start(args, format);

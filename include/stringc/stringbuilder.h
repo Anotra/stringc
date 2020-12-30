@@ -25,34 +25,34 @@ extern size_t
 stringbuilder_length(StringBuilder *sb);
 
 extern bool
-stringbuilder_set_length(StringBuilder *sb, size_t length);
+stringbuilder_set_length(StringBuilder *sb, const size_t length);
 
 extern void
 stringbuilder_reset(StringBuilder *sb);
 
 extern bool
-stringbuilder_insert(StringBuilder *sb, size_t position, char *string);
+stringbuilder_insert(StringBuilder *sb, const size_t position, const char *string);
 
 extern bool
-stringbuilder_insertl(StringBuilder *sb, size_t position, char *string, size_t length);
+stringbuilder_insertl(StringBuilder *sb, const size_t position, const char *string, const size_t length);
 
 extern bool
-stringbuilder_insertf(StringBuilder *sb, size_t position, char *format, ...);
+stringbuilder_insertf(StringBuilder *sb, const size_t position, const char *format, ...);
 
 extern bool
-stringbuilder_insert_sb(StringBuilder *dest, size_t position, StringBuilder *src);
+stringbuilder_insert_sb(StringBuilder *dest, const size_t position, const StringBuilder *src);
 
 extern bool
-stringbuilder_append(StringBuilder *sb, char *string);
+stringbuilder_append(StringBuilder *sb, const char *string);
 
 extern bool
-stringbuilder_appendl(StringBuilder *sb, char *string, size_t length);
+stringbuilder_appendl(StringBuilder *sb, const char *string, const size_t length);
 
 extern bool
-stringbuilder_appendf(StringBuilder *sb, char *format, ...);
+stringbuilder_appendf(StringBuilder *sb, const char *format, ...);
 
 extern bool
-stringbuilder_append_sb(StringBuilder *dest, StringBuilder *src);
+stringbuilder_append_sb(StringBuilder *dest, const StringBuilder *src);
 
 
 #endif//STRINGC_STRINGBUILDER_H
