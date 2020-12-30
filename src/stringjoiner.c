@@ -67,20 +67,16 @@ stringjoiner_to_string(StringJoiner *sj) {
 
 bool
 stringjoiner_add(StringJoiner *sj, char *string) {
-  const size_t len = stringbuilder_length(sj->sb);
-  bool fail = false;
-  if (len == 0) {
-    if (sj->prefix)
-      fail |= !stringbuilder_append(sj->sb, sj->prefix);
-    fail |= !stringbuilder_append(sj->sb, string);
-  } else {
-    if (sj->delimiter)
-      fail |= !stringbuilder_append(sj->sb, sj->delimiter);
-    fail |= !stringbuilder_append(sj->sb, string);
-  }
-  if (fail)
-    stringbuilder_set_length(sj->sb, len);
-  return !fail;
+  const size_t length = stringbuilder_length(sj->sb);
+  char *str_to_add = (length == 0) ? sj->prefix : sj->delimiter;
+  if (str_to_add && !stringbuilder_append(sj->sb, str_to_add))
+    goto fail;
+  if (stringbuilder_append(sj->sb, string))
+    return true;
+
+  fail:
+  stringbuilder_set_length(sj->sb, length);
+  return false;
 }
 
 bool
