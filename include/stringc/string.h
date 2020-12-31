@@ -4,6 +4,6 @@
 #include <string.h>
 
 extern char *
-strdupl(const char *const src, size_t *const size);
+strdupl(const char *const src, size_t *length);
 
 #endif//STRINGC_STRING_H
