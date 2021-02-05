@@ -18,7 +18,7 @@ StringJoiner *
 stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty) {
   StringJoiner *sj = calloc(1, sizeof *sj);
   if (sj) {
-    if (sj->sb = stringbuilder_create()) {
+    if ((sj->sb = stringbuilder_create())) {
       if (prefix    && !(sj->prefix    = strdup(prefix))
       ||  delimiter && !(sj->delimiter = strdup(delimiter))
       ||  suffix    && !(sj->suffix    = strdup(suffix))
@@ -36,14 +36,10 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
 
 void
 stringjoiner_destroy(StringJoiner *sj) {
-  if (sj->prefix)
-    free(sj->prefix);
-  if (sj->delimiter)
-    free(sj->delimiter);
-  if (sj->suffix)
-    free(sj->suffix);
-  if (sj->empty)
-    free(sj->empty);
+  free(sj->prefix);
+  free(sj->delimiter);
+  free(sj->suffix);
+  free(sj->empty);
   stringbuilder_destroy(sj->sb);
   free(sj);
 }
