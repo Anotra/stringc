@@ -19,15 +19,18 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
   StringJoiner *sj = calloc(1, sizeof *sj);
   if (sj) {
     if ((sj->sb = stringbuilder_create())) {
-      if (prefix    && !(sj->prefix    = strdup(prefix))
-      ||  delimiter && !(sj->delimiter = strdup(delimiter))
-      ||  suffix    && !(sj->suffix    = strdup(suffix))
-      ||  empty     && !(sj->empty     = strdup(empty))
-      ) {
-        stringjoiner_destroy(sj);
-        return NULL;
+      if ((prefix    && !(sj->prefix    = strdup(prefix)))
+       || (delimiter && !(sj->delimiter = strdup(delimiter)))
+       || (suffix    && !(sj->suffix    = strdup(suffix)))
+       || (empty     && !(sj->empty     = strdup(empty)))) {
+        free(sj->prefix);
+        free(sj->suffix);
+        free(sj->delimiter);
+        free(sj->empty);
+      } else {
+        return sj;
       }
-      return sj;
+      stringbuilder_destroy(sj->sb);
     }
     free(sj);
   }
