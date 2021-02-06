@@ -19,12 +19,8 @@ utf8_strlen(const uint8_t *str) {
   size_t len = 0;
   while (true) {
     switch (utf8_next(&str)) {
-      case -1: {
-        return -1;
-      } break;
-      case 0: {
-        return len;
-      } break;
+      case -1: return -1;
+      case 0:  return len;
       default: len++;
     }
   }
@@ -42,28 +38,26 @@ utf8_strlen_fast(const uint8_t *str) {
 int32_t
 utf8_next(const uint8_t **str) {
   int32_t first = *(*str)++;
-  if (first) {
-    if (first & 0x80) { //UTF-8
-      if (first & 0x40) {
-        int32_t codepoint = 0;
-        int shifted = 0;
-        for (; first & 0x40; first <<= 1, shifted++) {
-          const uint32_t next = *(*str)++;
-          if ((next & 0xC0) == 0x80) {
-            codepoint <<= 6;
-            codepoint |= next & 0x3F;
-          } else { //expected a continuation byte or null byte
-            if ((next & 0xC0) == 0xC0 /* first sequence of utf8 */ || next == '\0');
-              *str--;
-            return -1;
-          }
+  if (first & 0x80) { //UTF-8
+    if (first & 0x40) {
+      int32_t codepoint = 0;
+      int shifted = 0;
+      for (; first & 0x40; first <<= 1, shifted++) {
+        const uint32_t next = *(*str)++;
+        if ((next & 0xC0) == 0x80) {
+          codepoint <<= 6;
+          codepoint |= next & 0x3F;
+        } else { //expected a continuation byte or null byte
+          if ((next & 0xC0) == 0xC0 /* first sequence of utf8 */ || next == '\0');
+            *str--;
+          return -1;
         }
-        return ((first & 0x3F) << 6 * shifted - shifted) | codepoint;
-      } else { //unexpected a continuation byte
-        return -1;
       }
-    } else { //ASCII
-      return first;
+      return ((first & 0x3F) << 6 * shifted - shifted) | codepoint;
+    } else { //unexpected continuation byte
+      return -1;
     }
+  } else { //ASCII or null byte
+    return first;
   }
 }
