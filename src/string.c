@@ -43,21 +43,12 @@ utf8_next(const uint8_t **str) {
       int32_t codepoint = 0;
       int shifted = 0;
       for (; first & 0x40; first <<= 1, shifted++) {
-        const uint32_t next = *(*str)++;
-        if ((next & 0xC0) == 0x80) {
+        if ((**str & 0xC0) == 0x80) {
           codepoint <<= 6;
-          codepoint |= next & 0x3F;
-        } else { //expected a continuation byte or null byte
-          if ((next & 0xC0) == 0xC0 /* first sequence of utf8 */ || next == '\0');
-            *str--;
-          return -1;
-        }
+          codepoint |= *(*str)++ & 0x3F;
+        } else return -1;
       }
-      return ((first & 0x3F) << 6 * shifted - shifted) | codepoint;
-    } else { //unexpected continuation byte
-      return -1;
-    }
-  } else { //ASCII or null byte
-    return first;
-  }
+      return ((first & 0x3F) << (6 * shifted - shifted)) | codepoint;
+    } else return -1;
+  } else return first;
 }
