@@ -25,28 +25,23 @@ stringbuilder_destroy(StringBuilder *sb) {
 }
 
 static bool
-ensure_space(StringBuilder *sb, const size_t space_needed) {
-  if (!sb->string) {
-    size_t capacity = space_needed < 64 ? 64 : space_needed;
-    sb->string = malloc((capacity + 1) * sizeof *sb->string);
-    if (sb->string) {
-      sb->string[0] = '\0';
-      sb->capacity = capacity;
-      return true;
-    }
-    return false;
+increase_size(StringBuilder *sb, size_t space_needed) {
+  size_t new_capacity = 0x10;
+  for (; new_capacity - 1 < space_needed; new_capacity <<= 1)
+    if (!new_capacity) return false;
+  void *tmp = sb->string ? realloc(sb->string, new_capacity * sizeof *sb->string) : calloc(new_capacity, sizeof *sb->string);
+  if (tmp) {
+    sb->capacity = new_capacity - 1;
+    sb->string = tmp;
   }
+  return (bool)tmp;
+}
 
-  if (space_needed > sb->capacity - sb->length) {
-    size_t new_capacity = sb->capacity * 2;
-    if (new_capacity - sb->length < space_needed)
-      new_capacity = sb->length + space_needed;
-    char *new_string = realloc(sb->string, (new_capacity + 1) * sizeof *sb->string);
-    if (!new_string)
-      return false;
-    sb->string = new_string;
-    sb->capacity = new_capacity;
-  }
+static inline bool
+ensure_space(StringBuilder *sb, size_t space_needed) {
+  space_needed += sb->length;
+  if (sb->capacity < space_needed || !sb->string)
+    return increase_size(sb, space_needed);
   return true;
 }
 
