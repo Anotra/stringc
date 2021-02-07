@@ -15,10 +15,10 @@ strdupl(const char *const src, size_t *const lengthp) {
 }
 
 size_t
-utf8_strlen(const uint8_t *str) {
+utf8len(const char *str) {
   size_t len = 0;
   while (true) {
-    switch (utf8_next(&str)) {
+    switch (utf8next(&str)) {
       case -1: return -1;
       case 0:  return len;
       default: len++;
@@ -27,7 +27,7 @@ utf8_strlen(const uint8_t *str) {
 }
 
 size_t
-utf8_strlen_fast(const uint8_t *str) {
+utf8len_fast(const char *str) {
   size_t len = 0;
   for (; *str; str++)
     if ((*str & 0xC0) != 0x80)
@@ -36,7 +36,7 @@ utf8_strlen_fast(const uint8_t *str) {
 }
 
 int32_t
-utf8_next(const uint8_t **str) {
+utf8next(const char **str) {
   int32_t first = *(*str)++;
   if (first & 0x80) { //UTF-8
     if (first & 0x40) {
