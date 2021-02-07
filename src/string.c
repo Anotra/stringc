@@ -14,23 +14,29 @@ strdupl(const char *const src, size_t *const lengthp) {
   return dest;
 }
 
-size_t
-utf8len(const char *str) {
-  size_t len = 0;
+bool
+utf8validate(const char *str, size_t *len) {
+  size_t length = 0;
+  bool is_valid = true;
   while (true) {
     switch (utf8next(&str)) {
-      case -1: return -1;
-      case 0:  return len;
-      default: len++;
+      case -1: {
+        is_valid = false;
+      } break;
+      case 0:  {
+        if (len)
+          *len = length;
+      } return is_valid;
+      default: length++;
     }
   }
 }
 
 size_t
-utf8len_fast(const char *str) {
+utf8len(const char *str) {
   size_t len = 0;
-  for (; *str; str++)
-    if ((*str & 0xC0) != 0x80)
+  while (*str)
+    if ((*str++ & 0xC0) != 0x80)
       len++;
   return len;
 }
