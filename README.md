@@ -3,7 +3,7 @@
 #### [String](https://github.com/Anotra/stringc/blob/main/include/stringc/string.h)
 ```c
   size_t len;
-  char *dup = strdupl("Hello World!, Привет мир!", &len);
+  char *dup = strduplen("Hello World!, Привет мир!", &len);
   size_t len8;
   bool is_valid_utf8 = utf8validate(dup, &len8);
   printf("%zu, %zu\nutf8_valid: %s, len=%zu\n", len, utf8len(dup), is_valid_utf8 ? "t" : "f", len8); 

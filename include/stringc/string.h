@@ -6,7 +6,7 @@
 #include <inttypes.h>
 
 extern char *
-strdupl(const char *const src, size_t *length);
+strduplen(const char *const src, size_t *length);
 
 extern size_t
 utf8len(const char *str);
