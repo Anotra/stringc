@@ -14,26 +14,29 @@ struct stringjoiner {
   char *empty;
   char *suffix_or_empty_added;
   size_t count;
+  char strings[];
 };
+
+static char *
+strpcpy(char *dest, const char *src) {
+  size_t len = strlen(src) + 1;
+  memcpy(dest, src, len * sizeof *src);
+  return dest + len;
+}
 
 StringJoiner *
 stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty) {
-  StringJoiner *sj = calloc(1, sizeof *sj);
+  StringJoiner *sj = calloc(1, sizeof *sj + 
+      (prefix ? strlen(prefix) + 1: 0) + (delimiter ? strlen(delimiter) + 1: 0) +
+      (suffix ? strlen(suffix) + 1: 0) + (empty ? strlen(empty) + 1: 0));
   if (sj) {
-    if ((sj->sb = stringbuilder_create())) {
-      if ((prefix    && !(sj->prefix    = strdup(prefix)))
-       || (delimiter && !(sj->delimiter = strdup(delimiter)))
-       || (suffix    && !(sj->suffix    = strdup(suffix)))
-       || (empty     && !(sj->empty     = strdup(empty)))) {
-        free(sj->prefix);
-        free(sj->suffix);
-        free(sj->delimiter);
-        free(sj->empty);
-      } else {
-        return sj;
-      }
-      stringbuilder_destroy(sj->sb);
-    }
+    char *p = sj->strings;
+    if (prefix) p = strpcpy(sj->prefix = p, prefix);
+    if (delimiter) p = strpcpy(sj->delimiter = p, delimiter);
+    if (suffix) p = strpcpy(sj->suffix = p, suffix);
+    if (empty) p = strpcpy(sj->empty = p, empty);
+    if ((sj->sb = stringbuilder_create()))
+      return sj;
     free(sj);
   }
   return NULL;
@@ -41,10 +44,6 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
 
 void
 stringjoiner_destroy(StringJoiner *sj) {
-  free(sj->prefix);
-  free(sj->delimiter);
-  free(sj->suffix);
-  free(sj->empty);
   stringbuilder_destroy(sj->sb);
   free(sj);
 }
