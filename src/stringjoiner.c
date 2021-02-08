@@ -7,11 +7,12 @@
 #include "stringc/stringbuilder.h"
 
 struct stringjoiner {
+  StringBuilder *sb;
   char *prefix;
   char *delimiter;
   char *suffix;
   char *empty;
-  StringBuilder *sb;
+  size_t count;
 };
 
 StringJoiner *
@@ -49,6 +50,7 @@ stringjoiner_destroy(StringJoiner *sj) {
 
 void
 stringjoiner_reset(StringJoiner *sj) {
+  sj->count = 0;
   stringbuilder_reset(sj->sb);
 }
 
@@ -67,11 +69,13 @@ stringjoiner_to_string(StringJoiner *sj) {
 bool
 stringjoiner_add(StringJoiner *sj, const char *string) {
   const size_t length = stringbuilder_length(sj->sb);
-  char *str_to_add = (length == 0) ? sj->prefix : sj->delimiter;
+  char *str_to_add = sj->count ? sj->delimiter: sj->prefix;
   if (str_to_add && !stringbuilder_append(sj->sb, str_to_add))
     goto fail;
-  if (stringbuilder_append(sj->sb, string))
+  if (stringbuilder_append(sj->sb, string)) {
+    sj->count++;
     return true;
+  }
 
   fail:
   stringbuilder_set_length(sj->sb, length);

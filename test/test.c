@@ -36,4 +36,19 @@ int main() {
   printf("%s\n", sj_result);
   free(sj_result);
   stringjoiner_destroy(sj);
+
+  sj = stringjoiner_create(NULL, ", ", NULL, "[]");
+  for (int i=0; i<10; i++)
+    stringjoiner_addf(sj, i > 3 ? "%i" : "", i);
+  sj_result = stringjoiner_to_string(sj);
+  printf("%s\n", sj_result);
+  free(sj_result);
+
+  stringjoiner_reset(sj);
+  for (int i=5; i<10; i++)
+    stringjoiner_addf(sj, "%i", i);
+  sj_result = stringjoiner_to_string(sj);
+  printf("%s\n", sj_result);
+  free(sj_result);
+  stringjoiner_destroy(sj);
 }
