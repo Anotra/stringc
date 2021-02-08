@@ -12,6 +12,7 @@ struct stringjoiner {
   char *delimiter;
   char *suffix;
   char *empty;
+  char *suffix_or_empty_added;
   size_t count;
 };
 
@@ -51,23 +52,29 @@ stringjoiner_destroy(StringJoiner *sj) {
 void
 stringjoiner_reset(StringJoiner *sj) {
   sj->count = 0;
+  sj->suffix_or_empty_added = NULL;
   stringbuilder_reset(sj->sb);
+}
+
+const char *
+stringjoiner_string(StringJoiner *sj) {
+  if (!sj->suffix_or_empty_added && (sj->suffix_or_empty_added = sj->count ? sj->suffix : sj->empty))
+      stringbuilder_append(sj->sb, sj->suffix_or_empty_added);
+  return stringbuilder_string(sj->sb);
 }
 
 char *
 stringjoiner_to_string(StringJoiner *sj) {
-  const size_t len = stringbuilder_length(sj->sb);
-  if (len == 0)
-    return strdup(sj->empty ? sj->empty : "");
-  if (sj->suffix)
-    stringbuilder_append(sj->sb, sj->suffix);
-  char *string = stringbuilder_to_string(sj->sb);
-  stringbuilder_set_length(sj->sb, len);
-  return string;
+  stringjoiner_string(sj);
+  return stringbuilder_to_string(sj->sb);
 }
 
 bool
 stringjoiner_add(StringJoiner *sj, const char *string) {
+  if (sj->suffix_or_empty_added) {
+    stringbuilder_set_length(sj->sb, stringbuilder_length(sj->sb) - strlen(sj->suffix_or_empty_added));
+    sj->suffix_or_empty_added = NULL;
+  }
   const size_t length = stringbuilder_length(sj->sb);
   char *str_to_add = sj->count ? sj->delimiter: sj->prefix;
   if (str_to_add && !stringbuilder_append(sj->sb, str_to_add))
