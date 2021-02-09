@@ -7,7 +7,7 @@
 #include "stringc/stringbuilder.h"
 
 struct stringjoiner {
-  StringBuilder *sb;
+  stringbuilder *sb;
   char *prefix;
   char *delimiter;
   char *suffix;
@@ -24,9 +24,9 @@ strpcpy(char *dest, const char *src) {
   return dest + len;
 }
 
-StringJoiner *
+stringjoiner *
 stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty) {
-  StringJoiner *sj = calloc(1, sizeof *sj + 
+  stringjoiner *sj = calloc(1, sizeof *sj + 
       (prefix ? strlen(prefix) + 1 : 0) + (delimiter ? strlen(delimiter) + 1 : 0) +
       (suffix ? strlen(suffix) + 1 : 0) + (empty ? strlen(empty) + 1 : 0));
   if (sj) {
@@ -43,33 +43,33 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
 }
 
 void
-stringjoiner_destroy(StringJoiner *sj) {
+stringjoiner_destroy(stringjoiner *sj) {
   stringbuilder_destroy(sj->sb);
   free(sj);
 }
 
 void
-stringjoiner_reset(StringJoiner *sj) {
+stringjoiner_reset(stringjoiner *sj) {
   sj->count = 0;
   sj->suffix_or_empty_added = NULL;
   stringbuilder_reset(sj->sb);
 }
 
 const char *
-stringjoiner_string(StringJoiner *sj) {
+stringjoiner_string(stringjoiner *sj) {
   if (!sj->suffix_or_empty_added && (sj->suffix_or_empty_added = sj->count ? sj->suffix : sj->empty))
     stringbuilder_append(sj->sb, sj->suffix_or_empty_added);
   return stringbuilder_string(sj->sb);
 }
 
 char *
-stringjoiner_to_string(StringJoiner *sj) {
+stringjoiner_to_string(stringjoiner *sj) {
   stringjoiner_string(sj);
   return stringbuilder_to_string(sj->sb);
 }
 
 bool
-stringjoiner_add(StringJoiner *sj, const char *string) {
+stringjoiner_add(stringjoiner *sj, const char *string) {
   if (sj->suffix_or_empty_added) {
     stringbuilder_set_length(sj->sb, stringbuilder_length(sj->sb) - strlen(sj->suffix_or_empty_added));
     sj->suffix_or_empty_added = NULL;
@@ -89,7 +89,7 @@ stringjoiner_add(StringJoiner *sj, const char *string) {
 }
 
 bool
-stringjoiner_addf(StringJoiner *sj, const char *format, ...) {
+stringjoiner_addf(stringjoiner *sj, const char *format, ...) {
   va_list args;
   char buffer[65536];
   va_start(args, format);

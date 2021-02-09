@@ -6,13 +6,13 @@
 #include "stringc/stringjoiner.h"
 
 int main() {
-  StringBuilder *sb = stringbuilder_create();
+  stringbuilder *sb = stringbuilder_create();
   for (int i=0; i<10; i++)
     stringbuilder_appendf(sb, "%s", "Hello World!\n");
   for (int i=0; i<10; i++)
     stringbuilder_insertf(sb, 13, "%s", "Hello!!!\n");
     
-  StringBuilder *sb2 = stringbuilder_create();
+  stringbuilder *sb2 = stringbuilder_create();
   stringbuilder_append(sb2, "---SB2---\n");
     
   stringbuilder_insert_sb(sb, 13, sb2);
@@ -28,7 +28,7 @@ int main() {
   stringbuilder_destroy(sb2);
 
 
-  StringJoiner *sj = stringjoiner_create("StringJoiner:\n[\n  ", ",\n  ", "\n]", "[]");
+  stringjoiner *sj = stringjoiner_create("StringJoiner:\n[\n  ", ",\n  ", "\n]", "[]");
   stringjoiner_add(sj, "\"Hello!\"");
   stringjoiner_add(sj, "\"Hello!\"");
   stringjoiner_addf(sj, "\"Hello %i!\"", 123);

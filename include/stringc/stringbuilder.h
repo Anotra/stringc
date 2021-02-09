@@ -3,45 +3,45 @@
 
 #include <stdbool.h>
 
-typedef struct stringbuilder StringBuilder;
+typedef struct stringbuilder stringbuilder;
 
-extern StringBuilder *
+extern stringbuilder *
 stringbuilder_create();
 extern void
-stringbuilder_destroy(StringBuilder *sb);
+stringbuilder_destroy(stringbuilder *sb);
 
 /**
  * this pointer should be discarded after any changes made to the stringbuilder
  * @return internal string
  */
 extern const char *
-stringbuilder_string(StringBuilder *sb);
+stringbuilder_string(stringbuilder *sb);
 extern char *
-stringbuilder_to_string(StringBuilder *sb);
+stringbuilder_to_string(stringbuilder *sb);
 
 extern size_t
-stringbuilder_length(StringBuilder *sb);
+stringbuilder_length(stringbuilder *sb);
 extern bool
-stringbuilder_set_length(StringBuilder *sb, const size_t length);
+stringbuilder_set_length(stringbuilder *sb, const size_t length);
 extern void
-stringbuilder_reset(StringBuilder *sb);
+stringbuilder_reset(stringbuilder *sb);
 
 extern bool
-stringbuilder_insert(StringBuilder *sb, const size_t position, const char *string);
+stringbuilder_insert(stringbuilder *sb, const size_t position, const char *string);
 extern bool
-stringbuilder_insertl(StringBuilder *sb, const size_t position, const char *string, const size_t length);
+stringbuilder_insertl(stringbuilder *sb, const size_t position, const char *string, const size_t length);
 extern bool
-stringbuilder_insertf(StringBuilder *sb, const size_t position, const char *format, ...);
+stringbuilder_insertf(stringbuilder *sb, const size_t position, const char *format, ...);
 extern bool
-stringbuilder_insert_sb(StringBuilder *dest, const size_t position, const StringBuilder *src);
+stringbuilder_insert_sb(stringbuilder *dest, const size_t position, const stringbuilder *src);
 extern bool
-stringbuilder_append(StringBuilder *sb, const char *string);
+stringbuilder_append(stringbuilder *sb, const char *string);
 extern bool
-stringbuilder_appendl(StringBuilder *sb, const char *string, const size_t length);
+stringbuilder_appendl(stringbuilder *sb, const char *string, const size_t length);
 extern bool
-stringbuilder_appendf(StringBuilder *sb, const char *format, ...);
+stringbuilder_appendf(stringbuilder *sb, const char *format, ...);
 extern bool
-stringbuilder_append_sb(StringBuilder *dest, const StringBuilder *src);
+stringbuilder_append_sb(stringbuilder *dest, const stringbuilder *src);
 
 
 #endif//STRINGC_STRINGBUILDER_H

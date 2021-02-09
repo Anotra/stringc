@@ -12,7 +12,7 @@
 
 #### [StringBuilder](https://github.com/Anotra/stringc/blob/main/include/stringc/stringbuilder.h)
 ```c
-  StringBuilder *sb = stringbuilder_create();
+  stringbuilder *sb = stringbuilder_create();
   stringbuilder_append(sb, "Hello World!");
   stringbuilder_insert(sb, 0, "HELLO WORLD!\n");
   printf("%s", stringbuilder_string(sb));
@@ -21,11 +21,9 @@
 
 #### [StringJoiner](https://github.com/Anotra/stringc/blob/main/include/stringc/stringjoiner.h)
 ```c
-  StringJoiner *sj = stringjoiner_create("[", ", ", "]", "[]");
+  stringjoiner *sj = stringjoiner_create("[", ", ", "]", "[]");
   for (int i=0; i<100; i++)
     stringjoiner_addf(sj, "Item #%i", i);
-  char *result = stringjoiner_to_string(sj);
-  printf("%s\n", result);
-  free(result);
+  printf("%s\n", stringjoiner_string(sj));
   stringjoiner_destroy(sj);
 ```
