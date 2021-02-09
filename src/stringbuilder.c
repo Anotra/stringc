@@ -66,7 +66,7 @@ stringbuilder_reset(stringbuilder *sb) {
     sb->string[0] = '\0';
 }
 
-extern bool
+bool
 stringbuilder_insertl(stringbuilder *sb, const size_t position, const char *string, const size_t length) {
   if (ensure_space(sb, length)) {
     if (position > sb->length) {
@@ -82,7 +82,7 @@ stringbuilder_insertl(stringbuilder *sb, const size_t position, const char *stri
   return false;
 }
 
-extern bool
+bool
 stringbuilder_appendl(stringbuilder *sb, const char *string, const size_t length) {
   return stringbuilder_insertl(sb, sb->length, string, length);
 }
