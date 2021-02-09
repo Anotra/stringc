@@ -27,14 +27,14 @@ strpcpy(char *dest, const char *src) {
 StringJoiner *
 stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty) {
   StringJoiner *sj = calloc(1, sizeof *sj + 
-      (prefix ? strlen(prefix) + 1: 0) + (delimiter ? strlen(delimiter) + 1: 0) +
-      (suffix ? strlen(suffix) + 1: 0) + (empty ? strlen(empty) + 1: 0));
+      (prefix ? strlen(prefix) + 1 : 0) + (delimiter ? strlen(delimiter) + 1 : 0) +
+      (suffix ? strlen(suffix) + 1 : 0) + (empty ? strlen(empty) + 1 : 0));
   if (sj) {
     char *p = sj->strings;
-    if (prefix) p = strpcpy(sj->prefix = p, prefix);
+    if (prefix)    p = strpcpy(sj->prefix = p, prefix);
     if (delimiter) p = strpcpy(sj->delimiter = p, delimiter);
-    if (suffix) p = strpcpy(sj->suffix = p, suffix);
-    if (empty) p = strpcpy(sj->empty = p, empty);
+    if (suffix)    p = strpcpy(sj->suffix = p, suffix);
+    if (empty)     p = strpcpy(sj->empty = p, empty);
     if ((sj->sb = stringbuilder_create()))
       return sj;
     free(sj);
@@ -58,7 +58,7 @@ stringjoiner_reset(StringJoiner *sj) {
 const char *
 stringjoiner_string(StringJoiner *sj) {
   if (!sj->suffix_or_empty_added && (sj->suffix_or_empty_added = sj->count ? sj->suffix : sj->empty))
-      stringbuilder_append(sj->sb, sj->suffix_or_empty_added);
+    stringbuilder_append(sj->sb, sj->suffix_or_empty_added);
   return stringbuilder_string(sj->sb);
 }
 
@@ -75,7 +75,7 @@ stringjoiner_add(StringJoiner *sj, const char *string) {
     sj->suffix_or_empty_added = NULL;
   }
   const size_t length = stringbuilder_length(sj->sb);
-  char *str_to_add = sj->count ? sj->delimiter: sj->prefix;
+  char *str_to_add = sj->count ? sj->delimiter : sj->prefix;
   if (str_to_add && !stringbuilder_append(sj->sb, str_to_add))
     goto fail;
   if (stringbuilder_append(sj->sb, string)) {

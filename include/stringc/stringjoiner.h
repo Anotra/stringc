@@ -12,10 +12,14 @@ stringjoiner_destroy(StringJoiner *sj);
 extern void
 stringjoiner_reset(StringJoiner *sj);
 
-extern char *
-stringjoiner_to_string(StringJoiner *sj);
+/**
+ * this pointer should be discarded after any changes made to the stringjoiner
+ * @return internal string
+ */
 extern const char *
 stringjoiner_string(StringJoiner *sj);
+extern char *
+stringjoiner_to_string(StringJoiner *sj);
 
 extern bool
 stringjoiner_add(StringJoiner *sj, const char *string);
