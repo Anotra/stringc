@@ -27,6 +27,9 @@ extern void
 stringbuilder_reset(stringbuilder *sb);
 
 extern bool
+stringbuilder_delete(stringbuilder *sb, const size_t position, const size_t length);
+
+extern bool
 stringbuilder_insert(stringbuilder *sb, const size_t position, const char *string);
 extern bool
 stringbuilder_insertl(stringbuilder *sb, const size_t position, const char *string, const size_t length);

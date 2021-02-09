@@ -23,6 +23,8 @@ int main() {
   stringbuilder_appendf(sb2, "Hello from StringBuilder %i!\n", 2);
   stringbuilder_append_sb(sb, sb2);
   stringbuilder_appendl(sb, "TRUNCATED STRING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", 17);
+  stringbuilder_insert(sb, 10, "HELLO!WORLD!\n");
+  stringbuilder_delete(sb, 10, 6);
   printf("%s\n\n", stringbuilder_string(sb));
   stringbuilder_destroy(sb);
   stringbuilder_destroy(sb2);

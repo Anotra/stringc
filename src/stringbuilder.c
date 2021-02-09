@@ -67,6 +67,17 @@ stringbuilder_reset(stringbuilder *sb) {
 }
 
 bool
+stringbuilder_delete(stringbuilder *sb, const size_t position, const size_t length) {
+  if ((position + length) < sb->length) {
+    if (length)
+      memmove(&sb->string[position], &sb->string[position + length], (sb->length - position + 1) * sizeof *sb->string);
+    sb->length -= length;
+    return true;
+  }
+  return false;
+}
+
+bool
 stringbuilder_insertl(stringbuilder *sb, const size_t position, const char *string, const size_t length) {
   if (ensure_space(sb, length)) {
     if (position > sb->length) {
