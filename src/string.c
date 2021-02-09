@@ -54,7 +54,7 @@ utf8next(const char **str) {
           codepoint |= *(*str)++ & 0x3F;
         } else return -1;
       }
-      return ((first & 0x3F) << (6 * shifted - shifted)) | codepoint;
+      return shifted > 5 ? -1 : ((first & 0x3F) << (6 * shifted - shifted)) | codepoint;
     } else return -1;
   } else return first;
 }
