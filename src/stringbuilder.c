@@ -106,10 +106,10 @@ stringbuilder_appendf(StringBuilder *sb, const char *format, ...) {
     va_start(args, format);
     printed = vsnprintf(&sb->string[sb->length], sb->capacity - sb->length, format, args);
     va_end(args);
-  } else {
+  } else return false;
+  if (printed < 0) {
     return false;
-  }
-  if (printed > sb->capacity - sb->length) {
+  } else if ((size_t)printed > sb->capacity - sb->length) {
     if (ensure_space(sb, printed)) {
       va_start(args, format);
       printed = vsnprintf(&sb->string[sb->length], sb->capacity - sb->length, format, args);
@@ -132,7 +132,9 @@ stringbuilder_insertf(StringBuilder *sb, const size_t position, const char *form
   va_start(args, format);
   int printed = vsnprintf(buffer, sizeof buffer, format, args);
   va_end(args);
-  if (printed < sizeof buffer) {
+  if (printed < 0) {
+    return false;
+  } else if ((size_t)printed < sizeof buffer) {
     return stringbuilder_insertl(sb, position, buffer, printed);
   } else {
     char *string = malloc((printed + 1) * sizeof *string);

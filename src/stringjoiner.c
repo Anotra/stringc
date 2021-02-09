@@ -95,7 +95,9 @@ stringjoiner_addf(StringJoiner *sj, const char *format, ...) {
   va_start(args, format);
   int printed = vsnprintf(buffer, sizeof buffer - 1, format, args);
   va_end(args);
-  if (printed < sizeof buffer - 1) {
+  if (printed < 0) {
+    return false;
+  } else if ((size_t)printed < sizeof buffer - 1) {
     buffer[printed] = '\0';
     return stringjoiner_add(sj, buffer);
   } else {
