@@ -1,5 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
 
+enable_language(C)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_C_FLAGS "-Wall -Wextra")
+    set(CMAKE_C_FLAGS_DEBUG "-g")
+    set(CMAKE_C_FLAGS_RELEASE "-O3")
+endif()
+
 project(stringc)
 add_library(${PROJECT_NAME} SHARED
     src/string.c
