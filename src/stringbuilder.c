@@ -185,5 +185,6 @@ stringbuilder_to_string(stringbuilder *sb) {
 
 const char *
 stringbuilder_string(stringbuilder *sb) {
+  ensure_space(sb, 0);
   return sb->string;
 }
