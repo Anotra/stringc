@@ -11,7 +11,7 @@ strduplen(const char *const src, size_t *length);
 extern size_t
 utf8len(const char *str);
 extern bool
-utf8validate(const char *str, size_t *len) ;
+utf8validate(const char *str, size_t *length) ;
 extern int32_t
 utf8next(const char **str);
 

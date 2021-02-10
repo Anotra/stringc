@@ -15,21 +15,16 @@ strduplen(const char *const src, size_t *const lengthp) {
 }
 
 bool
-utf8validate(const char *str, size_t *len) {
-  size_t length = 0;
+utf8validate(const char *str, size_t *length) {
+  size_t len = 0;
   bool is_valid = true;
-  while (true) {
-    switch (utf8next(&str)) {
-      case -1: {
-        is_valid = false;
-      } break;
-      case 0:  {
-        if (len)
-          *len = length;
-      } return is_valid;
-      default: length++;
-    }
+  for (int32_t codepoint; (codepoint = utf8next(&str));) {
+    if (codepoint == -1) is_valid = false;
+    else len++;
   }
+  if (length)
+    *length = len;
+  return is_valid;
 }
 
 size_t
