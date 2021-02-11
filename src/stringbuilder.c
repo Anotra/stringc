@@ -12,7 +12,7 @@ struct stringbuilder {
 };
 
 stringbuilder *
-stringbuilder_create() {
+stringbuilder_create(void) {
   stringbuilder *sb = calloc(1, sizeof *sb);
   return sb;
 }

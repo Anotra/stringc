@@ -6,7 +6,7 @@
 typedef struct stringbuilder stringbuilder;
 
 extern stringbuilder *
-stringbuilder_create();
+stringbuilder_create(void);
 extern void
 stringbuilder_destroy(stringbuilder *sb);
 
