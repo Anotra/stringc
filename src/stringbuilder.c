@@ -188,3 +188,30 @@ stringbuilder_string(stringbuilder *sb) {
   ensure_space(sb, 0);
   return sb->string;
 }
+
+size_t
+stringbuilder_append_fgets(stringbuilder *sb, FILE *file) {
+  char buf[0x800];
+  char *const start = buf, *end = buf + sizeof buf;
+  size_t count = 0;
+  do {
+    char *pos = start;
+    do {
+      int character = fgetc(file);
+      switch (character) {
+        case EOF: {
+          end = NULL;
+        } break;
+
+        case '\n':
+          end = NULL;
+          // fallthru
+        default:
+          *pos++ = character;
+      };
+    } while (end && pos < end);
+    if (pos > start)
+      stringbuilder_appendl(sb, start, count += pos - start);
+  } while (end);
+  return count;
+}

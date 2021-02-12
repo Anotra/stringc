@@ -1,6 +1,7 @@
 #ifndef STRINGC_STRINGBUILDER_H
 #define STRINGC_STRINGBUILDER_H
 
+#include <stdio.h>
 #include <stdbool.h>
 
 typedef struct stringbuilder stringbuilder;
@@ -46,5 +47,7 @@ stringbuilder_appendf(stringbuilder *sb, const char *format, ...);
 extern bool
 stringbuilder_append_sb(stringbuilder *dest, const stringbuilder *src);
 
+extern size_t
+stringbuilder_append_fgets(stringbuilder *sb, FILE *file);
 
 #endif//STRINGC_STRINGBUILDER_H
