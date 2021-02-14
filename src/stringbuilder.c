@@ -208,10 +208,12 @@ stringbuilder_append_fgets(stringbuilder *sb, FILE *file) {
           // fallthru
         default:
           *pos++ = character;
-      };
+      }
     } while (end && pos < end);
-    if (pos > start)
-      stringbuilder_appendl(sb, start, count += pos - start);
+    if (pos > start) {
+      stringbuilder_appendl(sb, start, pos - start);
+      count += pos - start;
+    }
   } while (end);
   return count;
 }
