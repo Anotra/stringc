@@ -13,6 +13,8 @@ utf8len(const char *str);
 extern bool
 utf8validate(const char *str, size_t *length) ;
 extern int32_t
-utf8next(const char **str);
+utf8decode(const char **str);
+extern bool
+utf8encode(char **buf, char *end, const int32_t codepoint, size_t *utf8_size);
 
 #endif//STRINGC_STRING_H
