@@ -15,6 +15,7 @@ endif()
 project(stringc)
 add_library(${PROJECT_NAME} SHARED
     src/string.c
+    src/charset/utf8.c
     src/stringbuilder.c
     src/stringjoiner.c
 )
