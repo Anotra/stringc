@@ -98,13 +98,12 @@ utf8encode(char **buf, char *end, const int32_t codepoint, size_t *utf8_size) {
     }
     
     //begin inserting utf8 chars
-    *buf += bytes_needed;
+    char *tmp = (*buf += bytes_needed);
     for (cp = codepoint, mask = 0x3F; (mask & cp) != cp; cp >>= 6, mask >>= 1)
       //insert continuation bytes back to front
-      *(--*buf) = 0x80 | (cp & 0x3F);
+      *--tmp = 0x80 | (cp & 0x3F);
     //insert first byte
-    *(--*buf) = (~mask << 1) | cp;
-    *buf += bytes_needed;
+    *--tmp = (~mask << 1) | cp;
     return true;
   }
 }
