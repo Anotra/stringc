@@ -5,8 +5,8 @@
   size_t len;
   char *dup = strduplen("Hello World!, Привет мир!", &len);
   size_t len8;
-  bool is_valid_utf8 = utf8validate(dup, &len8);
-  printf("%zu, %zu\nutf8_valid: %s, len=%zu\n", len, utf8len(dup), is_valid_utf8 ? "t" : "f", len8); 
+  bool is_valid_utf8 = utf8validate(dup, NULL, &len8);
+  printf("%zu, %zu\nutf8_valid: %s, len=%zu\n", len, utf8len(dup, NULL), is_valid_utf8 ? "t" : "f", len8); 
   free(dup);
 ```
 
