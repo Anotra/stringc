@@ -20,6 +20,10 @@ stringbuilder_string(stringbuilder *sb);
 extern char *
 stringbuilder_to_string(stringbuilder *sb);
 
+extern void
+stringbuilder_set_max_capacity(stringbuilder *sb, size_t capacity);
+extern size_t
+stringbuilder_max_capacity(stringbuilder *sb);
 extern size_t
 stringbuilder_length(stringbuilder *sb);
 extern bool

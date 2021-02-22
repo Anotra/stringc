@@ -8,6 +8,7 @@
 struct stringbuilder {
   size_t length;
   size_t capacity;
+  size_t capacity_max;
   char *string;
 };
 
@@ -28,6 +29,11 @@ increase_size(stringbuilder *sb, size_t space_needed) {
   size_t new_capacity = 0x10;
   for (; new_capacity - 1 < space_needed; new_capacity <<= 1)
     if (!new_capacity) return false;
+  if (sb->capacity_max && new_capacity - 1 > sb->capacity_max) {
+    if (sb->capacity_max >= space_needed) {
+      new_capacity = sb->capacity_max + 1;
+    } else return false;
+  }
   void *tmp = sb->string ? realloc(sb->string, new_capacity * sizeof *sb->string) : calloc(new_capacity, sizeof *sb->string);
   if (tmp) {
     sb->capacity = new_capacity - 1;
@@ -39,6 +45,8 @@ increase_size(stringbuilder *sb, size_t space_needed) {
 static inline bool
 ensure_space(stringbuilder *sb, size_t space_needed) {
   space_needed += sb->length;
+  if (sb->capacity_max && space_needed > sb->capacity_max)
+    return false;
   if (sb->capacity < space_needed || !sb->string)
     return increase_size(sb, space_needed);
   return true;
@@ -64,6 +72,16 @@ stringbuilder_reset(stringbuilder *sb) {
   sb->length = 0;
   if (sb->string)
     sb->string[0] = '\0';
+}
+
+void
+stringbuilder_set_max_capacity(stringbuilder *sb, size_t capacity) {
+  sb->capacity_max = capacity;
+}
+
+size_t
+stringbuilder_max_capacity(stringbuilder *sb) {
+  return sb->capacity_max;
 }
 
 bool
