@@ -4,7 +4,7 @@
 #include "stringc/string.h"
 
 bool
-utf8validate(const char *str, char *end, size_t *length) {
+utf8validate(const char *str, const char *end, size_t *length) {
   size_t len = 0;
   bool is_valid = true;
   for (int32_t codepoint; (codepoint = utf8decode(&str, end, false));) {
@@ -19,7 +19,7 @@ utf8validate(const char *str, char *end, size_t *length) {
 }
 
 size_t
-utf8len(const char *str, char *end) {
+utf8len(const char *str, const char *end) {
   size_t len = 0;
   if (end) {
     while (str < end && *str)
@@ -34,7 +34,7 @@ utf8len(const char *str, char *end) {
 }
 
 int32_t
-utf8decode(const char **str, char *end, bool reset_ptr_on_fail) {
+utf8decode(const char **str, const char *end, bool reset_ptr_on_fail) {
   const char *const begin = *str;
   if (end && *str >= end) {
     if (*str == end) {
@@ -69,9 +69,9 @@ utf8decode(const char **str, char *end, bool reset_ptr_on_fail) {
 }
 
 bool
-utf8encode(char **buf, char *end, const int32_t codepoint, size_t *utf8_size) {
+utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_size) {
   size_t bytes_needed = 1;
-  if ((codepoint & 0x7F) == codepoint) { //is ascii
+  if ((codepoint & 0x7F) == codepoint) { //ASCII
     if (utf8_size) *utf8_size = bytes_needed;
     if (!buf || (end && (*buf + bytes_needed) > end)) {
       errno = ENOBUFS;
