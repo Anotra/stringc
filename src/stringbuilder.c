@@ -132,15 +132,15 @@ stringbuilder_appendf(stringbuilder *sb, const char *format, ...) {
   va_list args;
   if (ensure_space(sb, 0)) {
     va_start(args, format);
-    printed = vsnprintf(&sb->string[sb->length], sb->capacity - sb->length, format, args);
+    printed = vsnprintf(&sb->string[sb->length], sb->capacity - sb->length + 1, format, args);
     va_end(args);
   } else return false;
   if (printed < 0) {
     return false;
-  } else if ((size_t)printed > sb->capacity - sb->length) {
+  } else if (sb->length + printed > sb->capacity) {
     if (ensure_space(sb, printed)) {
       va_start(args, format);
-      printed = vsnprintf(&sb->string[sb->length], sb->capacity - sb->length, format, args);
+      printed = vsnprintf(&sb->string[sb->length], sb->capacity - sb->length + 1, format, args);
       va_end(args);
     } else {
       //undo append
