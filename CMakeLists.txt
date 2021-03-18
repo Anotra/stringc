@@ -16,6 +16,7 @@ project(stringc)
 add_library(${PROJECT_NAME} SHARED
     src/string.c
     src/charset/utf8.c
+    src/encoding/base64.c
     src/stringbuilder.c
     src/stringjoiner.c
 )
