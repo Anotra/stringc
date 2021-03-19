@@ -19,9 +19,9 @@ extern bool
 utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_size);
 
 //BASE64
-extern uint8_t *
-base64encode(const uint8_t *in, size_t len, uint8_t *out);
-extern uint8_t *
-base64decode(const uint8_t *in, uint8_t *out);
+extern char *
+base64encode(const void *in, size_t len, char *out, size_t *out_len);
+extern void *
+base64decode(const char *in, void *out, size_t *out_len);
 
 #endif//STRINGC_STRING_H
