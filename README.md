@@ -9,7 +9,29 @@
   printf("%zu, %zu\nutf8_valid: %s, len=%zu\n", len, utf8len(dup, NULL), is_valid_utf8 ? "t" : "f", len8); 
   free(dup);
 ```
-
+#### base64 encoding/decoding
+```c
+  const char *string = "Hello World!!";
+  char encoded[64], decoded[64];
+  size_t encoded_len, decoded_len;
+  base64encode(string, strlen(string), encoded, &encoded_len);
+  base64decode(encoded, decoded, &decoded_len);
+  printf(
+    "%s\n%s\n%s\n"
+    "String Length: %zu\nEncoding Length: %zu\nsuccess: %c\n", 
+    string, encoded, decoded,
+    decoded_len, encoded_len, strcmp(string, decoded) == 0 ? 'T' : 'F'
+  );
+```
+Output
+```
+  Hello World!!
+  SGVsbG8gV29ybGQhIQ==
+  Hello World!!
+  String Length: 13
+  Encoding Length: 20
+  success: T
+```
 ### [stringc/stringbuilder.h](https://github.com/Anotra/stringc/blob/main/include/stringc/stringbuilder.h)
 ```c
   stringbuilder *sb = stringbuilder_create();
