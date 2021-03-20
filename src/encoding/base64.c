@@ -95,6 +95,8 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
         if (isspace(character))
           continue;
         goto fail;
+      } else if (padding) { //expected padding but was something else
+        goto fail;
       } else {
         bits <<= 6;
         bits |= b;
