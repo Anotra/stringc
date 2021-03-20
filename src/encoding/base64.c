@@ -1,8 +1,7 @@
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "stringc/string.h"
-
-
 
 static const uint8_t *base64_characters = (uint8_t *) "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -34,6 +33,7 @@ static size_t
 base64decodelen(size_t len) {
   return (len / 4 + !!(len % 4)) * 3;
 }
+
 char *
 base64encode(const void *in_buf, size_t len, char *out, size_t *out_len) {
   const uint8_t *in = in_buf;
@@ -79,23 +79,27 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
   uint8_t *ret = out;
   for (uint8_t character = 1, padding = 0; character; padding = 0) {
     uint32_t bits = 0;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4;) {
       character = character ? *in++ : 0;
       int32_t b = base64_decode_table[character];
-      bits <<= 6;
       if (character == '=') {
         if (i < 2)
           goto fail;
+        bits <<= 6;
         padding++;
       } else if (b == 0xFF) {
+        if (isspace(character))
+          continue;
         goto fail;
       } else {
+        bits <<= 6;
         bits |= b;
       }
+      i++;
     }
-    *out++ = (bits >> 16) & 0xFF;
-    if (padding < 2) *out++ = (bits >> 8) & 0xFF;
-    if (padding < 1) *out++ =  bits       & 0xFF;
+                     *out++ = (bits >> 16) & 0xFF;
+    if (padding < 2) *out++ = (bits >>  8) & 0xFF;
+    if (padding < 1) *out++ =  bits        & 0xFF;
   }
   *out = 0;
   if (out_len) *out_len = out - ret;
