@@ -83,8 +83,12 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
       character = character ? *in++ : 0;
       int32_t b = base64_decode_table[character];
       if (character == '=') {
-        if (i < 2)
+        //unexpected '=' sign at the start of a sequence should just reset the loop
+        if (i < 2) {
+          if (i == 0)
+            continue;
           goto fail;
+        }
         bits <<= 6;
         padding++;
       } else if (b == 0xFF) {
