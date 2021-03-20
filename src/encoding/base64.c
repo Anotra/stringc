@@ -74,32 +74,32 @@ base64encode(const void *in_buf, size_t len, char *out, size_t *out_len) {
 void *
 base64decode(const char *in, void *out_buf, size_t *out_len) {
   uint8_t *out = out_buf;
-  int free_ret_on_fail = !out;
+  const int free_ret_on_fail = !out;
   if (!out && !(out = malloc(base64decodelen(strlen(in)) + 1))) return NULL;
   uint8_t *ret = out;
   for (uint8_t character = 1, padding = 0; character; padding = 0) {
     uint32_t bits = 0;
     for (int i = 0; i < 4;) {
       character = character ? *in++ : 0;
-      int32_t b = base64_decode_table[character];
-      if (character == '=') {
-        //unexpected '=' sign at the start of a sequence should just reset the loop
-        if (i < 2) {
-          if (i == 0)
-            continue;
-          goto fail;
-        }
-        bits <<= 6;
-        padding++;
-      } else if (b == 0xFF) {
-        if (isspace(character))
+      int32_t val = base64_decode_table[character];
+      if (val == 0xFF) {
+         if (character == '=') {
+          //unexpected '=' sign at the start of a sequence should just reset the loop
+          switch (i) {
+            case 0: continue;
+            case 1: goto fail;
+            default:
+              bits <<= 6;
+              padding++;
+          }
+        } else if (isspace(character)) {
           continue;
-        goto fail;
+        } else goto fail;
       } else if (padding) { //expected padding but was something else
         goto fail;
       } else {
         bits <<= 6;
-        bits |= b;
+        bits |= val;
       }
       i++;
     }
