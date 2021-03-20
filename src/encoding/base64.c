@@ -75,7 +75,7 @@ void *
 base64decode(const char *in, void *out_buf, size_t *out_len) {
   uint8_t *out = out_buf;
   const int free_ret_on_fail = !out;
-  if (!out && !(out = malloc(base64decodelen(strlen(in)) + 1))) return NULL;
+  if (!out && !(out = malloc(base64decodelen(strlen(in))))) return NULL;
   uint8_t *ret = out;
   for (uint8_t character = 1, padding = 0; character && *in; padding = 0) {
     uint32_t bits = 0;
@@ -107,7 +107,6 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
     if (padding < 2) *out++ = (bits >>  8) & 0xFF;
     if (padding < 1) *out++ =  bits        & 0xFF;
   }
-  *out = 0;
   if (out_len) *out_len = out - ret;
   return ret;
 
