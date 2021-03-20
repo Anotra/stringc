@@ -86,7 +86,11 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
         if (character == '=' || !character) {
           //unexpected '=' sign at the start of a sequence should just reset the loop
           switch (i) {
-            case 0: continue;
+            case 0:
+              if (character == '=')
+                continue;
+              if (!character)
+                goto done;
             case 1: goto fail;
             default:
               bits <<= 6;
@@ -107,6 +111,7 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
     if (padding < 2) *out++ = (bits >>  8) & 0xFF;
     if (padding < 1) *out++ =  bits        & 0xFF;
   }
+  done:
   if (out_len) *out_len = out - ret;
   return ret;
 
