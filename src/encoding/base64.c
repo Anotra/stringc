@@ -35,23 +35,24 @@ base64decodelen(size_t len) {
 }
 
 char *
-base64encode(const void *in_buf, size_t len, char *out, size_t *out_len) {
+base64encode(const void *in_buf, size_t len, char *out, size_t out_size, size_t *out_len) {
   const uint8_t *in = in_buf;
-  if (!out && !(out = malloc(base64encodelen(len))))
-    return NULL;
+  const int free_ret_on_fail = !out;
+  if (!out) {
+    out_size = base64encodelen(len);
+    if (!(out = malloc(out_size)))
+      return NULL;
+  }
   char *ret = out;
   uint32_t bits;
-  while (len >= 3) {
-    bits = *in++;
-    bits <<= 8;
-    bits |= *in++;
-    bits <<= 8;
+  for (; len >= 3 && out_size >= 4; len -= 3, out_size -= 4) {
+    bits =  *in++ << 16;
+    bits |= *in++ <<  8;
     bits |= *in++;
     *out++ = base64_characters[(bits >> 18) & 0x3F];
     *out++ = base64_characters[(bits >> 12) & 0x3F];
     *out++ = base64_characters[(bits >>  6) & 0x3F];
     *out++ = base64_characters[ bits        & 0x3F];
-    len -= 3;
   }
   if (len) {
     bits = 0;
@@ -64,19 +65,29 @@ base64encode(const void *in_buf, size_t len, char *out, size_t *out_len) {
         bytes_used++;
       }
     }
-    for (int i=18; i >= 0; i -= 6)
-      *out++ = bytes_used-- >= 0 ? base64_characters[(bits >> i) & 0x3F] : '=';
+    for (int i=18; i >= 0; i -= 6) {
+      if (out_size--) {
+        *out++ = bytes_used-- >= 0 ? base64_characters[(bits >> i) & 0x3F] : '=';
+      } else {
+        if (free_ret_on_fail) //THIS SHOULD NEVER HAPPEN
+          free(out);
+        return NULL;
+      }
+    }
   }
   if (out_len) *out_len = out - ret;
   return ret;
 }
 
 void *
-base64decode(const char *in, void *out_buf, size_t *out_len) {
+base64decode(const char *in, void *out_buf, size_t out_size, size_t *out_len) {
   uint8_t *out = out_buf;
   const int free_ret_on_fail = !out;
-  if (!out && !(out = malloc(base64decodelen(strlen(in)))))
-    return NULL;
+  if (!out) {
+    out_size = base64decodelen(strlen(in));
+    if (!(out = malloc(out_size)))
+      return NULL;
+  }
   uint8_t *ret = out;
   for (uint8_t character = 1, padding = 0; character && *in; padding = 0) {
     uint32_t bits = 0;
@@ -91,7 +102,8 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
                 continue;
               if (!character)
                 goto done;
-            case 1: goto fail;
+            case 1:
+              goto fail;
             default:
               bits <<= 6;
               padding++;
@@ -107,10 +119,14 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
       }
       i++;
     }
-                     *out++ = (bits >> 16) & 0xFF;
-    if (padding < 2) *out++ = (bits >>  8) & 0xFF;
-    if (padding < 1) *out++ =  bits        & 0xFF;
+    if (out_size >= 3u - padding) {
+      out_size   -= 3u - padding;
+                       *out++ = (bits >> 16);
+      if (padding < 2) *out++ = (bits >>  8);
+      if (padding < 1) *out++ =  bits;
+    } else goto fail;
   }
+  
   done:
   if (out_len) *out_len = out - ret;
   return ret;
@@ -123,12 +139,17 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
 }
 
 char *
-base64encodes(const void *in, char *out, size_t *out_len) {
+base64encodes(const void *in, char *out, size_t out_size, size_t *out_len) {
   const size_t len = strlen(in);
-  if (!out && !(out = malloc(base64encodelen(len) + 1)))
+  if (!out) {
+    out_size = base64encodelen(len) + 1;
+    if (!(out = malloc(out_size)))
+      return NULL;
+  } else if (!out_size) {
     return NULL;
+  }
   size_t encoded_len;
-  char *encoded = base64encode(in, len, out, &encoded_len);
+  char *encoded = base64encode(in, len, out, out_size - 1, &encoded_len);
   if (encoded)
     encoded[encoded_len] = 0;
   if (out_len)
@@ -137,11 +158,16 @@ base64encodes(const void *in, char *out, size_t *out_len) {
 }
 
 void *
-base64decodes(const char *in, void *out, size_t *out_len) {
-  if (!out && !(out = malloc(base64decodelen(strlen(in)) + 1)))
+base64decodes(const char *in, void *out, size_t out_size, size_t *out_len) {
+  if (!out) {
+    out_size = base64decodelen(strlen(in)) + 1;
+    if (!(out = malloc(out_size)))
+      return NULL;
+  } else if (!out_size) {
     return NULL;
+  }
   size_t decoded_len;
-  char *decoded = base64decode(in, out, &decoded_len);
+  char *decoded = base64decode(in, out, out_size - 1, &decoded_len);
   if (decoded)
     decoded[decoded_len] = 0;
   if (out_len)

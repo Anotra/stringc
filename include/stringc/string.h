@@ -20,13 +20,13 @@ utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_si
 
 //BASE64
 extern char *
-base64encode(const void *in, size_t len, char *out, size_t *out_len);
+base64encode(const void *in, size_t len, char *out, size_t out_size, size_t *out_len);
 extern void *
-base64decode(const char *in, void *out, size_t *out_len);
+base64decode(const char *in, void *out, size_t out_size, size_t *out_len);
 extern char *
-base64encodes(const void *in, char *out, size_t *out_len);
+base64encodes(const void *in, char *out, size_t out_size, size_t *out_len);
 extern void *
-base64decodes(const char *in, void *out, size_t *out_len);
+base64decodes(const char *in, void *out, size_t out_size, size_t *out_len);
 
 
 //BASE16
