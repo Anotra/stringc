@@ -37,7 +37,8 @@ base64decodelen(size_t len) {
 char *
 base64encode(const void *in_buf, size_t len, char *out, size_t *out_len) {
   const uint8_t *in = in_buf;
-  if (!out && !(out = malloc(base64encodelen(len) + 1))) return NULL;
+  if (!out && !(out = malloc(base64encodelen(len))))
+    return NULL;
   char *ret = out;
   uint32_t bits;
   while (len >= 3) {
@@ -67,7 +68,6 @@ base64encode(const void *in_buf, size_t len, char *out, size_t *out_len) {
       *out++ = bytes_used-- >= 0 ? base64_characters[(bits >> i) & 0x3F] : '=';
   }
   if (out_len) *out_len = out - ret;
-  *out = 0;
   return ret;
 }
 
@@ -75,7 +75,8 @@ void *
 base64decode(const char *in, void *out_buf, size_t *out_len) {
   uint8_t *out = out_buf;
   const int free_ret_on_fail = !out;
-  if (!out && !(out = malloc(base64decodelen(strlen(in))))) return NULL;
+  if (!out && !(out = malloc(base64decodelen(strlen(in)))))
+    return NULL;
   uint8_t *ret = out;
   for (uint8_t character = 1, padding = 0; character && *in; padding = 0) {
     uint32_t bits = 0;
@@ -84,7 +85,6 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
       uint32_t val = base64_decode_table[character];
       if (val == 0xFF) {
         if (character == '=' || !character) {
-          //unexpected '=' sign at the start of a sequence should just reset the loop
           switch (i) {
             case 0:
               if (character == '=')
@@ -99,7 +99,7 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
         } else if (isspace(character)) {
           continue;
         } else goto fail;
-      } else if (padding) { //expected padding but was something else
+      } else if (padding) {
         goto fail;
       } else {
         bits <<= 6;
@@ -120,4 +120,31 @@ base64decode(const char *in, void *out_buf, size_t *out_len) {
     free(ret);
   if (out_len) *out_len = 0;
   return NULL;
+}
+
+char *
+base64encodes(const void *in, char *out, size_t *out_len) {
+  const size_t len = strlen(in);
+  if (!out && !(out = malloc(base64encodelen(len) + 1)))
+    return NULL;
+  size_t encoded_len;
+  char *encoded = base64encode(in, len, out, &encoded_len);
+  if (encoded)
+    encoded[encoded_len] = 0;
+  if (out_len)
+    *out_len = encoded_len;
+  return encoded;
+}
+
+void *
+base64decodes(const char *in, void *out, size_t *out_len) {
+  if (!out && !(out = malloc(base64decodelen(strlen(in)) + 1)))
+    return NULL;
+  size_t decoded_len;
+  char *decoded = base64decode(in, out, &decoded_len);
+  if (decoded)
+    decoded[decoded_len] = 0;
+  if (out_len)
+    *out_len = decoded_len;
+  return decoded;
 }

@@ -23,5 +23,16 @@ extern char *
 base64encode(const void *in, size_t len, char *out, size_t *out_len);
 extern void *
 base64decode(const char *in, void *out, size_t *out_len);
+extern char *
+base64encodes(const void *in, char *out, size_t *out_len);
+extern void *
+base64decodes(const char *in, void *out, size_t *out_len);
+
+
+//BASE16
+extern char *
+base16encode(const void *in, size_t len, char *out, size_t *out_len);
+extern void *
+base16decode(const char *in, void *out, size_t *out_len);
 
 #endif//STRINGC_STRING_H
