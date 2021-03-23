@@ -10,7 +10,7 @@ struct base64digits {
   uint8_t padding[128];
 };
 
-base64digits default_base64_characters = {
+static const base64digits default_base64_characters = {
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
   {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
@@ -42,7 +42,7 @@ base64digits_init(base64digits *digits, const char *characters) {
     case 64: memcpy(digits->characters, characters, 64);
       break;
     case  3: digits->characters[64] = characters[2]; //fallthru
-    case  2: digits->characters[63] = characters[1]; //fallthru
+    case  2: digits->characters[63] = characters[1];
              digits->characters[62] = characters[0];
       break;
     case  1: digits->characters[64] = characters[0];
@@ -95,7 +95,7 @@ base64encode_ex(const base64digits *digits, const void *in_buf, size_t in_size, 
   char *ret = out;
   uint32_t bits;
   for (; in_size >= 3 && out_size >= 4; in_size -= 3, out_size -= 4) {
-    bits =  *in++ << 16;
+    bits  = *in++ << 16;
     bits |= *in++ <<  8;
     bits |= *in++;
     *out++ = base64characters[(bits >> 18) & 0x3F];
@@ -186,6 +186,7 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
   if (free_ret_on_fail)
     free(ret);
   if (out_len) *out_len = 0;
+  //TODO: realloc
   return NULL;
 }
 
@@ -224,6 +225,7 @@ base64decodes_ex(const base64digits *digits, const char *in, size_t in_size, voi
     decoded[decoded_len] = 0;
   if (out_len)
     *out_len = decoded_len;
+  //TODO: realloc
   return decoded;
 }
 
@@ -234,7 +236,7 @@ base64encode(const void *in, size_t in_size, char *out, size_t out_size, size_t 
 
 void *
 base64decode(const char *in, size_t in_size, void *out, size_t out_size, size_t *out_len) {
-  return base64decodes_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
+  return base64decode_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
 }
 
 char *
