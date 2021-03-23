@@ -140,42 +140,63 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
       return NULL;
   }
   uint8_t *ret = out;
-  for (uint8_t character = 1, padding = 0; character && *in; padding = 0) {
+  while (in_size >= 4 && out_size >= 3) {
+    uint32_t error = 0;
     uint32_t bits = 0;
-    for (int i = 0; i < 4;) {
-      character = character ? *in++ : 0;
-      uint32_t val = base64decode_table[character];
-      if (val == 0xFF) {
-        if (character == base64_padding_character || !character) {
-          switch (i) {
-            case 0:
-              if (character == base64_padding_character)
-                continue;
-              if (!character)
-                goto done;
-            case 1:
-              goto fail;
-            default:
-              bits <<= 6;
-              padding++;
-          }
-        } else if (isspace(character)) {
-          continue;
-        } else goto fail;
-      } else if (padding) {
-        goto fail;
-      } else if (in_size--) {
-        bits <<= 6;
-        bits |= val;
-      } else goto fail;
-      i++;
+    for (int i=18; i >= 0; i-=6) {
+      uint32_t val = base64decode_table[*(uint8_t *)in++];
+      error |= val;
+      bits |= val << i;
     }
-    if (out_size >= 3u - padding) {
-      out_size   -= 3u - padding;
-                       *out++ = (bits >> 16);
-      if (padding < 2) *out++ = (bits >>  8);
-      if (padding < 1) *out++ =  bits;
-    } else goto fail;
+    if (error == 0xFF) {
+      in -= 4;
+      break;
+    } else {
+      *out++ = bits >> 16;
+      *out++ = bits >>  8;
+      *out++ = bits;
+      in_size -= 4;
+      out_size -= 3;
+    }
+  }
+  if (in_size) {
+    for (uint8_t character = 1, padding = 0; character && *in; padding = 0) {
+      uint32_t bits = 0;
+      for (int i = 0; i < 4;) {
+        character = character ? *in++ : 0;
+        uint32_t val = base64decode_table[character];
+        if (val == 0xFF) {
+          if (character == base64_padding_character || !character) {
+            switch (i) {
+              case 0:
+                if (character == base64_padding_character)
+                  continue;
+                if (!character)
+                  goto done;
+              case 1:
+                goto fail;
+              default:
+                bits <<= 6;
+                padding++;
+            }
+          } else if (isspace(character)) {
+            continue;
+          } else goto fail;
+        } else if (padding) {
+          goto fail;
+        } else if (in_size--) {
+          bits <<= 6;
+          bits |= val;
+        } else goto fail;
+        i++;
+      }
+      if (out_size >= 3u - padding) {
+        out_size   -= 3u - padding;
+                         *out++ = (bits >> 16);
+        if (padding < 2) *out++ = (bits >>  8);
+        if (padding < 1) *out++ =  bits;
+      } else goto fail;
+    }
   }
   
   done:
