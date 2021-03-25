@@ -61,7 +61,6 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
     if (suffix)    p = strpcpy(sj->suffix = p, suffix);
     if (empty)     p = strpcpy(sj->empty = p, empty);
     return sj;
-    free(sj);
   }
   return NULL;
 }
