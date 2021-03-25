@@ -1,3 +1,27 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* MIT License                                                                    *
+*                                                                                *
+* Copyright (c) 2020 Anotra                                                      *
+*                                                                                *
+* Permission is hereby granted, free of charge, to any person obtaining a copy   *
+* of this software and associated documentation files (the "Software"), to deal  *
+* in the Software without restriction, including without limitation the rights   *
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell      *
+* copies of the Software, and to permit persons to whom the Software is          *
+* furnished to do so, subject to the following conditions:                       *
+*                                                                                *
+* The above copyright notice and this permission notice shall be included in all *
+* copies or substantial portions of the Software.                                *
+*                                                                                *
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR     *
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,       *
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE    *
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER         *
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  *
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE  *
+* SOFTWARE.                                                                      *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -135,6 +159,8 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
   const uint8_t base64_padding_character = digits->characters[64];
   uint8_t *out = out_buf;
   const int free_ret_on_fail = !out;
+  if (!in_size)
+    in_size = strlen(in);
   if (!out) {
     out_size = base64decodelen(strlen(in));
     if (!(out = malloc(out_size)))
@@ -144,7 +170,7 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
   while (in_size >= 4 && out_size >= 3) {
     uint32_t error = 0;
     uint32_t bits = 0;
-    for (int i=18; i >= 0; i-=6) {
+    for (int i = 18; i >= 0; i -= 6) {
       uint32_t val = base64decode_table[*(uint8_t *)in++];
       error |= val;
       bits |= val << i;
@@ -160,55 +186,61 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
       out_size -= 3;
     }
   }
-  if (in_size) {
-    for (uint8_t character = 1, padding = 0; character && *in; padding = 0) {
-      uint32_t bits = 0;
-      for (int i = 0; i < 4;) {
-        character = character ? *in++ : 0;
-        uint32_t val = base64decode_table[character];
-        if (val == 0xFF) {
-          if (character == base64_padding_character || !character) {
-            switch (i) {
-              case 0:
-                if (character == base64_padding_character)
-                  continue;
-                if (!character)
-                  goto done;
-              case 1:
-                goto fail;
-              default:
-                bits <<= 6;
-                padding++;
-            }
-          } else if (isspace(character)) {
-            continue;
-          } else goto fail;
-        } else if (padding) {
+  for (uint8_t padding = 0; in_size; padding = 0) {
+    uint32_t bits = 0;
+    int i = 4;
+    while (i > 0 && in_size) {
+      in_size--;
+      uint8_t character = *in++;
+      uint8_t val = base64decode_table[character];
+      if (val == 0xFF) {
+        if (!character) {
           goto fail;
-        } else if (in_size--) {
-          bits <<= 6;
-          bits |= val;
+        } else if (character == base64_padding_character) {
+          switch (i) {
+            case 4:   continue;
+            case 3:   goto fail;
+            default:  bits <<= 6;
+                      padding++;
+                      i--;
+                      continue;
+          }
+        } else if (isspace(character)) {
+          continue;
         } else goto fail;
-        i++;
+      } else if (padding) {
+        goto fail;
+      } else {
+        bits <<= 6;
+        bits |= val;
+        i--;
+        continue;
       }
-      if (out_size >= 3u - padding) {
-        out_size   -= 3u - padding;
-                         *out++ = (bits >> 16);
-        if (padding < 2) *out++ = (bits >>  8);
-        if (padding < 1) *out++ =  bits;
-      } else goto fail;
+    }
+    switch (i) {
+      case 4: continue;
+      case 3: goto fail;
+      case 2: //fallthru
+      case 1: bits <<= i * 6;
+              padding += i;
+              //fallthru
+      default:
+        if (out_size >= 3u - padding) {
+            out_size -= 3u - padding;
+                           *out++ = (bits >> 16);
+          if (padding < 2) *out++ = (bits >>  8);
+          if (padding < 1) *out++ =  bits;
+        } else goto fail;
     }
   }
-  
-  done:
   if (out_len) *out_len = out - ret;
+  //TODO: realloc
   return ret;
 
   fail:
   if (free_ret_on_fail)
     free(ret);
   if (out_len) *out_len = 0;
-  //TODO: realloc
   return NULL;
 }
 
