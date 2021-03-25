@@ -29,6 +29,10 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 char *  strduplen(const char *const src, size_t *length);
 
 //UTF8
@@ -37,5 +41,8 @@ bool    utf8validate(const char *str, const char *end, size_t *length) ;
 int32_t utf8decode(const char **str, const char *end, bool reset_ptr_on_fail);
 bool    utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_size);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif//STRINGC_STRING_H

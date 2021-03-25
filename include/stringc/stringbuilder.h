@@ -28,6 +28,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct stringbuilder stringbuilder;
 
 stringbuilder *stringbuilder_create(void);
@@ -55,5 +59,9 @@ bool         stringbuilder_appendl(stringbuilder *sb, const char *string, const 
 bool         stringbuilder_appendf(stringbuilder *sb, const char *format, ...);
 bool         stringbuilder_append_sb(stringbuilder *dest, const stringbuilder *src);
 size_t       stringbuilder_append_fgets(stringbuilder *sb, FILE *file);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//STRINGC_STRINGBUILDER_H

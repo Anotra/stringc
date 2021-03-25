@@ -27,6 +27,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct stringjoiner stringjoiner;
 
 stringjoiner * stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty);
@@ -42,5 +46,9 @@ char *         stringjoiner_to_string(stringjoiner *sj);
 
 bool           stringjoiner_add(stringjoiner *sj, const char *string);
 bool           stringjoiner_addf(stringjoiner *sj, const char *format, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//STRINGC_STRINGJOINER_H
