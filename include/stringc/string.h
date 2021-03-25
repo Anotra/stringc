@@ -5,8 +5,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-extern char *
-strduplen(const char *const src, size_t *length);
+char *  strduplen(const char *const src, size_t *length);
 
 //UTF8
 size_t  utf8len(const char *str, const char *end);
