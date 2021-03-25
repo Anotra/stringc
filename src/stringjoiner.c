@@ -29,9 +29,10 @@
 
 #include "stringc/stringjoiner.h"
 #include "stringc/stringbuilder.h"
+#include "stringbuilder.h"
 
 struct stringjoiner {
-  stringbuilder *sb;
+  stringbuilder sb;
   char *prefix;
   char *delimiter;
   char *suffix;
@@ -59,8 +60,7 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
     if (delimiter) p = strpcpy(sj->delimiter = p, delimiter);
     if (suffix)    p = strpcpy(sj->suffix = p, suffix);
     if (empty)     p = strpcpy(sj->empty = p, empty);
-    if ((sj->sb = stringbuilder_create()))
-      return sj;
+    return sj;
     free(sj);
   }
   return NULL;
@@ -68,7 +68,7 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
 
 void
 stringjoiner_destroy(stringjoiner *sj) {
-  stringbuilder_destroy(sj->sb);
+  stringbuilder_destroy(&sj->sb);
   free(sj);
 }
 
@@ -76,39 +76,39 @@ void
 stringjoiner_reset(stringjoiner *sj) {
   sj->count = 0;
   sj->suffix_or_empty_added = NULL;
-  stringbuilder_reset(sj->sb);
+  stringbuilder_reset(&sj->sb);
 }
 
 const char *
 stringjoiner_string(stringjoiner *sj) {
   if (!sj->suffix_or_empty_added && (sj->suffix_or_empty_added = sj->count ? sj->suffix : sj->empty))
-    stringbuilder_append(sj->sb, sj->suffix_or_empty_added);
-  return stringbuilder_string(sj->sb);
+    stringbuilder_append(&sj->sb, sj->suffix_or_empty_added);
+  return stringbuilder_string(&sj->sb);
 }
 
 char *
 stringjoiner_to_string(stringjoiner *sj) {
   stringjoiner_string(sj);
-  return stringbuilder_to_string(sj->sb);
+  return stringbuilder_to_string(&sj->sb);
 }
 
 bool
 stringjoiner_add(stringjoiner *sj, const char *string) {
   if (sj->suffix_or_empty_added) {
-    stringbuilder_set_length(sj->sb, stringbuilder_length(sj->sb) - strlen(sj->suffix_or_empty_added));
+    stringbuilder_set_length(&sj->sb, stringbuilder_length(&sj->sb) - strlen(sj->suffix_or_empty_added));
     sj->suffix_or_empty_added = NULL;
   }
-  const size_t length = stringbuilder_length(sj->sb);
+  const size_t length = stringbuilder_length(&sj->sb);
   char *str_to_add = sj->count ? sj->delimiter : sj->prefix;
-  if (str_to_add && !stringbuilder_append(sj->sb, str_to_add))
+  if (str_to_add && !stringbuilder_append(&sj->sb, str_to_add))
     goto fail;
-  if (stringbuilder_append(sj->sb, string)) {
+  if (stringbuilder_append(&sj->sb, string)) {
     sj->count++;
     return true;
   }
 
   fail:
-  stringbuilder_set_length(sj->sb, length);
+  stringbuilder_set_length(&sj->sb, length);
   return false;
 }
 

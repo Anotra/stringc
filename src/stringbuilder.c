@@ -27,25 +27,22 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "stringc/stringbuilder.h"
-
-struct stringbuilder {
-  size_t length;
-  size_t capacity;
-  size_t capacity_max;
-  char *string;
-};
+#include "stringbuilder.h"
 
 stringbuilder *
 stringbuilder_create(void) {
   stringbuilder *sb = calloc(1, sizeof *sb);
+  if (sb) sb->free_on_destroy = true;
   return sb;
 }
 
 void
 stringbuilder_destroy(stringbuilder *sb) {
+  bool free_on_destroy = sb->free_on_destroy;
   free(sb->string);
-  free(sb);
+  memset(sb, 0, sizeof *sb);
+  if (free_on_destroy)
+    free(sb);
 }
 
 static bool
