@@ -263,7 +263,7 @@ base64encodes_ex(const base64digits *digits, const void *in, size_t in_size, cha
   return encoded;
 }
 
-void *
+char *
 base64decodes_ex(const base64digits *digits, const char *in, size_t in_size, void *out, size_t out_size, size_t *out_len) {
   if (!in_size) in_size = strlen(in);
   if (!out) {
@@ -298,7 +298,7 @@ base64encodes(const void *in, size_t in_size, char *out, size_t out_size, size_t
   return base64encodes_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
 }
 
-void *
+char *
 base64decodes(const char *in, size_t in_size, void *out, size_t out_size, size_t *out_len) {
   return base64decodes_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
 }
