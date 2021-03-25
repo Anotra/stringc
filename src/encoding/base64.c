@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
-#define STRINGC_STRING_BASE64_PRIVATE
-#include "stringc/string.h"
+#define STRINGC_BASE64_PRIVATE
+#include "stringc/base64.h"
 
 struct base64digits {
   uint8_t characters[128];
