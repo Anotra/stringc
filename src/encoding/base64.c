@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define STRINGC_BASE64_PRIVATE
 #include "stringc/base64.h"
@@ -153,10 +154,85 @@ base64encode_ex(const base64digits *digits, const void *in_buf, size_t in_size, 
   return ret;
 }
 
-void *
-base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void *out_buf, size_t out_size, size_t *out_len) {
+static void
+base64decode_fast(const base64digits *digits, size_t *in_size, size_t *out_size, uint8_t **in, uint8_t **out) {
+  const uint8_t *base64decode_table = digits->decode_table;
+  while (*in_size >= 4 && *out_size >= 3) {
+    uint8_t error = 0;
+    uint32_t bits = 0;
+    for (int i = 18; i >= 0; i -= 6) {
+      uint8_t val = base64decode_table[*(*in)++];
+      error |= val;
+      bits |= val << i;
+    }
+    if (error == 0xFF) {
+      (*in) -= 4;
+      break;
+    } else {
+      *(*out)++ = bits >> 16;
+      *(*out)++ = bits >>  8;
+      *(*out)++ = bits;
+      (*in_size) -= 4;
+      (*out_size) -= 3;
+    }
+  }
+}
+
+static bool
+base64decode_tolerant(const base64digits *digits, size_t *in_size, size_t *out_size, uint8_t **in, uint8_t **out) {
   const uint8_t *base64decode_table = digits->decode_table;
   const uint8_t base64_padding_character = digits->characters[64];
+  for (uint8_t padding = 0; *in_size; padding = 0) {
+    uint32_t bits = 0;
+    int i = 4;
+    while (i > 0 && *in_size) {
+      (*in_size)--;
+      uint8_t character = *(*in)++;
+      uint8_t val = base64decode_table[character];
+      if (val == 0xFF) {
+        if (!character) {
+          return false;
+        } else if (character == base64_padding_character) {
+          switch (i) {
+            case 4:   continue;
+            case 3:   return false;
+            default:  bits <<= 6;
+                      padding++;
+                      i--;
+                      continue;
+          }
+        } else if (isspace(character)) {
+          continue;
+        } else return false;
+      } else if (padding) {
+         return false;
+      } else {
+        bits <<= 6;
+        bits |= val;
+        i--;
+        continue;
+      }
+    }
+    switch (i) {
+      case 4:  continue;
+      case 3:  return false;
+      case 2:  //fallthru
+      case 1:  bits <<= i * 6;
+               padding += i;
+               //fallthru
+      case 0: if (*out_size >= 3u - padding) {
+                  *out_size -= 3u - padding;
+                                 *(*out)++ = (bits >> 16);
+                if (padding < 2) *(*out)++ = (bits >>  8);
+                if (padding < 1) *(*out)++ =  bits;
+              } else return false;
+    }
+  }
+  return true;
+}
+
+void *
+base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void *out_buf, size_t out_size, size_t *out_len) {
   uint8_t *out = out_buf;
   const int free_ret_on_fail = !out;
   if (!in_size)
@@ -166,82 +242,20 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
     if (!(out = malloc(out_size)))
       return NULL;
   }
-  uint8_t *ret = out;
-  while (in_size >= 4 && out_size >= 3) {
-    uint32_t error = 0;
-    uint32_t bits = 0;
-    for (int i = 18; i >= 0; i -= 6) {
-      uint32_t val = base64decode_table[*(uint8_t *)in++];
-      error |= val;
-      bits |= val << i;
-    }
-    if (error == 0xFF) {
-      in -= 4;
-      break;
-    } else {
-      *out++ = bits >> 16;
-      *out++ = bits >>  8;
-      *out++ = bits;
-      in_size -= 4;
-      out_size -= 3;
-    }
-  }
-  for (uint8_t padding = 0; in_size; padding = 0) {
-    uint32_t bits = 0;
-    int i = 4;
-    while (i > 0 && in_size) {
-      in_size--;
-      uint8_t character = *in++;
-      uint8_t val = base64decode_table[character];
-      if (val == 0xFF) {
-        if (!character) {
-          goto fail;
-        } else if (character == base64_padding_character) {
-          switch (i) {
-            case 4:   continue;
-            case 3:   goto fail;
-            default:  bits <<= 6;
-                      padding++;
-                      i--;
-                      continue;
-          }
-        } else if (isspace(character)) {
-          continue;
-        } else goto fail;
-      } else if (padding) {
-        goto fail;
-      } else {
-        bits <<= 6;
-        bits |= val;
-        i--;
-        continue;
-      }
-    }
-    switch (i) {
-      case 4: continue;
-      case 3: goto fail;
-      case 2: //fallthru
-      case 1: bits <<= i * 6;
-              padding += i;
-              //fallthru
-      default:
-        if (out_size >= 3u - padding) {
-            out_size -= 3u - padding;
-                           *out++ = (bits >> 16);
-          if (padding < 2) *out++ = (bits >>  8);
-          if (padding < 1) *out++ =  bits;
-        } else goto fail;
-    }
-  }
-  if (out_len) *out_len = out - ret;
-  //TODO: realloc
-  return ret;
+  uint8_t *const ret = out;
+  base64decode_fast(digits, &in_size, &out_size, (uint8_t **)&in, &out);
+  base64decode_tolerant(digits, &in_size, &out_size, (uint8_t **)&in, &out);
 
-  fail:
-  if (free_ret_on_fail)
-    free(ret);
-  if (out_len) *out_len = 0;
-  return NULL;
+  if (in_size) {
+    if (free_ret_on_fail)
+      free(ret);
+    if (out_len) *out_len = 0;
+    return NULL;
+  } else {
+    if (out_len) *out_len = out - ret;
+    //TODO: realloc
+    return ret;
+  }
 }
 
 char *
