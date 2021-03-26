@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
-include(CheckLanguage)
 
 enable_language(C)
+set(CMAKE_C_STANDARD 99)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
+endif()
+
+if (WIN32)
+    set(WINDOWS_EXPORT_ALL_SYMBOLS 1)
 endif()
 
 if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -13,6 +17,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_C_FLAGS_RELEASE "-O3")
 endif()
 
+include(CheckLanguage)
 check_language(CXX)
 if (CMAKE_CXX_COMPILER)
     enable_language(CXX)
@@ -22,7 +27,6 @@ if (CMAKE_CXX_COMPILER)
         set(CMAKE_CXX_FLAGS_RELEASE "-O3")
     endif()
 endif()
-
 
 project(stringc)
 add_library(${PROJECT_NAME} SHARED)
