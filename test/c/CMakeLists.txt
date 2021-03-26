@@ -1,4 +1,4 @@
-
+add_subdirectory(base64)
 project(stringc_mainc)
 add_executable(${PROJECT_NAME} main.c)
 target_link_libraries(${PROJECT_NAME} PRIVATE stringc)
