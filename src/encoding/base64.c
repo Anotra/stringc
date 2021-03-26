@@ -157,23 +157,26 @@ base64encode_ex(const base64digits *digits, const void *in_buf, size_t in_size, 
 static void
 base64decode_fast(const base64digits *digits, size_t *in_size, size_t *out_size, uint8_t **in, uint8_t **out) {
   const uint8_t *base64decode_table = digits->decode_table;
-  while (*in_size >= 4 && *out_size >= 3) {
+  while (*in_size >= 12 && *out_size >= 9) {
     uint8_t error = 0;
-    uint32_t bits = 0;
-    for (int i = 18; i >= 0; i -= 6) {
-      uint8_t val = base64decode_table[*(*in)++];
-      error |= val;
-      bits |= val << i;
+    for (int i = 0; i < 3; i++) {
+      uint32_t bits = 0;
+      for (int i = 18; i >= 0; i -= 6) {
+        uint8_t val = base64decode_table[*(*in)++];
+        error      |= val;
+        bits       |= val  << i;
+      }
+      *(*out)++     = bits >> 16;
+      *(*out)++     = bits >>  8;
+      *(*out)++     = bits;
     }
     if (error == 0xFF) {
-      (*in) -= 4;
-      break;
+      (*in)        -= 12;
+      (*out)       -=  9;
+      return;
     } else {
-      *(*out)++ = bits >> 16;
-      *(*out)++ = bits >>  8;
-      *(*out)++ = bits;
-      (*in_size) -= 4;
-      (*out_size) -= 3;
+      (*in_size)   -= 12;
+      (*out_size)  -=  9;
     }
   }
 }
