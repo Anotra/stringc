@@ -39,6 +39,10 @@ struct stringjoiner {
   char *empty;
   char *suffix_or_empty_added;
   size_t count;
+  size_t length_prefix;
+  size_t length_delimiter;
+  size_t length_suffix;
+  size_t length_empty;
   char strings[];
 };
 
@@ -56,10 +60,10 @@ stringjoiner_create(const char *prefix, const char *delimiter, const char *suffi
       (suffix ? strlen(suffix) + 1 : 0) + (empty ? strlen(empty) + 1 : 0));
   if (sj) {
     char *p = sj->strings;
-    if (prefix)    p = strpcpy(sj->prefix = p, prefix);
-    if (delimiter) p = strpcpy(sj->delimiter = p, delimiter);
-    if (suffix)    p = strpcpy(sj->suffix = p, suffix);
-    if (empty)     p = strpcpy(sj->empty = p, empty);
+    if (prefix)    sj->length_prefix    = strlen(prefix),    p = strpcpy(sj->prefix = p,    prefix);
+    if (delimiter) sj->length_delimiter = strlen(delimiter), p = strpcpy(sj->delimiter = p, delimiter);
+    if (suffix)    sj->length_suffix    = strlen(suffix),    p = strpcpy(sj->suffix = p,    suffix);
+    if (empty)     sj->length_empty     = strlen(empty),     p = strpcpy(sj->empty = p,     empty);
     return sj;
   }
   return NULL;
@@ -76,6 +80,12 @@ stringjoiner_reset(stringjoiner *sj) {
   sj->count = 0;
   sj->suffix_or_empty_added = NULL;
   stringbuilder_reset(&sj->sb);
+}
+
+size_t
+stringjoiner_length(stringjoiner *sj) {
+  return stringbuilder_length(&sj->sb) + 
+    (sj->suffix_or_empty_added ? 0 : sj->count ? sj->length_suffix : sj->length_empty);
 }
 
 const char *

@@ -37,6 +37,8 @@ stringjoiner * stringjoiner_create(const char *prefix, const char *delimiter, co
 void           stringjoiner_destroy(stringjoiner *sj);
 void           stringjoiner_reset(stringjoiner *sj);
 
+size_t         stringjoiner_length(stringjoiner *sj);
+
 /**
  * this pointer should be discarded after any changes made to the stringjoiner
  * @return internal string
