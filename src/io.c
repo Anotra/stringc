@@ -30,6 +30,7 @@ int
 fgets_line(char **line, size_t *capacity, size_t *length, FILE *stream) {
   if (!*line && !(*line = malloc(*capacity = 64)))
     return *capacity = 0, -1;
+  (*line)[0] = 0;
   if (length)
     *length = 0;
   char *position = *line;
