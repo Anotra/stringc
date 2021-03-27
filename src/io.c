@@ -22,22 +22,39 @@
 * SOFTWARE.                                                                      *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef STRINGC_STRINGBUILDER_INTERNAL_H
-#define STRINGC_STRINGBUILDER_INTERNAL_H
+#include <string.h>
 
-#include "stringc/stringbuilder.h"
+#include "stringc/io.h"
 
-struct stringbuilder {
-  size_t length;
-  size_t capacity;
-  size_t capacity_max;
-  char *string;
-  bool free_on_destroy;
-  struct {
-    char *string;
-    size_t capacity;
-    size_t length;
-  } fgets_string;
-};
-
-#endif//STRINGC_STRINGBUILDER_INTERNAL_H
+int
+fgets_line(char **line, size_t *capacity, size_t *length, FILE *stream) {
+  if (!*line && !(*line = malloc(*capacity = 64)))
+    return *capacity = 0, -1;
+  if (length)
+    *length = 0;
+  char *position = *line;
+  while (1) {
+    (*line)[*capacity - 1] = 1;
+    (*line)[*capacity - 2] = 0;
+    if (fgets(position, *line + *capacity - position, stream)) {
+      if ((*line)[*capacity - 1] == 0
+       && (*line)[*capacity - 2] != '\n') {
+        size_t new_capacity = *capacity * 2;
+        char *tmp = realloc(*line, new_capacity);
+        if (tmp) {
+          position = tmp + *capacity - 1;
+          *line = tmp;
+          *capacity = new_capacity;
+        } else return -1;
+      } else goto success;
+    } else if (position != *line) {
+      if (feof(stream))
+        goto success;
+      return -1;
+    } else return 0;
+  }
+  success:
+  if (length)
+    *length = position - *line + strlen(position);
+  return 1;
+}

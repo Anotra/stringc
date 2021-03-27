@@ -22,22 +22,20 @@
 * SOFTWARE.                                                                      *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef STRINGC_STRINGBUILDER_INTERNAL_H
-#define STRINGC_STRINGBUILDER_INTERNAL_H
+#ifndef STRINGC_IO_H
+#define STRINGC_IO_H
 
-#include "stringc/stringbuilder.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-struct stringbuilder {
-  size_t length;
-  size_t capacity;
-  size_t capacity_max;
-  char *string;
-  bool free_on_destroy;
-  struct {
-    char *string;
-    size_t capacity;
-    size_t length;
-  } fgets_string;
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif//STRINGC_STRINGBUILDER_INTERNAL_H
+int fgets_line(char **line, size_t *capacity, size_t *length, FILE *stream);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif//STRINGC_IO_H

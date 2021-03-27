@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "stringbuilder.h"
+#include "stringc/io.h"
 
 stringbuilder *
 stringbuilder_create(void) {
@@ -40,6 +41,7 @@ void
 stringbuilder_destroy(stringbuilder *sb) {
   bool free_on_destroy = sb->free_on_destroy;
   free(sb->string);
+  free(sb->fgets_string.string);
   memset(sb, 0, sizeof *sb);
   if (free_on_destroy)
     free(sb);
@@ -230,29 +232,10 @@ stringbuilder_string(stringbuilder *sb) {
 
 size_t
 stringbuilder_append_fgets(stringbuilder *sb, FILE *file) {
-  char buf[0x800];
-  char *const start = buf, *end = buf + sizeof buf;
-  size_t count = 0;
-  do {
-    char *pos = start;
-    do {
-      int character = fgetc(file);
-      switch (character) {
-        case EOF: {
-          end = NULL;
-        } break;
-
-        case '\n':
-          end = NULL;
-          // fallthru
-        default:
-          *pos++ = character;
-      }
-    } while (end && pos < end);
-    if (pos > start) {
-      stringbuilder_appendl(sb, start, pos - start);
-      count += pos - start;
-    }
-  } while (end);
-  return count;
+  switch (fgets_line(&sb->fgets_string.string, &sb->fgets_string.capacity, &sb->fgets_string.length, file)) {
+    case 1:   stringbuilder_appendl(sb, sb->fgets_string.string, sb->fgets_string.length);
+              //fallthru
+    case 0:   return sb->fgets_string.length;
+    default:  return 0;
+  }
 }
