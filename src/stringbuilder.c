@@ -177,7 +177,7 @@ stringbuilder_appendf(stringbuilder *sb, const char *format, ...) {
 bool
 stringbuilder_insertf(stringbuilder *sb, const size_t position, const char *format, ...) {
   va_list args;
-  char buffer[65536];
+  char buffer[0x2000];
   va_start(args, format);
   int printed = vsnprintf(buffer, sizeof buffer, format, args);
   va_end(args);

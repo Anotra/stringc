@@ -114,7 +114,7 @@ stringjoiner_add(stringjoiner *sj, const char *string) {
 bool
 stringjoiner_addf(stringjoiner *sj, const char *format, ...) {
   va_list args;
-  char buffer[65536];
+  char buffer[0x2000];
   va_start(args, format);
   int printed = vsnprintf(buffer, sizeof buffer - 1, format, args);
   va_end(args);
