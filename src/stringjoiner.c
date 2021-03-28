@@ -33,16 +33,12 @@
 
 struct stringjoiner {
   stringbuilder sb;
-  char *prefix;
-  char *delimiter;
-  char *suffix;
-  char *empty;
-  char *suffix_or_empty_added;
+  struct {
+    char  *string;
+    size_t length;
+  } prefix, delimiter, suffix,
+    empty, suffix_or_empty_added;
   size_t count;
-  size_t length_prefix;
-  size_t length_delimiter;
-  size_t length_suffix;
-  size_t length_empty;
   char strings[];
 };
 
@@ -57,13 +53,13 @@ stringjoiner *
 stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty) {
   stringjoiner *sj = calloc(1, sizeof *sj + 
       (prefix ? strlen(prefix) + 1 : 0) + (delimiter ? strlen(delimiter) + 1 : 0) +
-      (suffix ? strlen(suffix) + 1 : 0) + (empty ? strlen(empty) + 1 : 0));
+      (suffix ? strlen(suffix) + 1 : 0) + (empty     ? strlen(empty)     + 1 : 0));
   if (sj) {
     char *p = sj->strings;
-    if (prefix)    sj->length_prefix    = strlen(prefix),    p = strpcpy(sj->prefix = p,    prefix);
-    if (delimiter) sj->length_delimiter = strlen(delimiter), p = strpcpy(sj->delimiter = p, delimiter);
-    if (suffix)    sj->length_suffix    = strlen(suffix),    p = strpcpy(sj->suffix = p,    suffix);
-    if (empty)     sj->length_empty     = strlen(empty),     p = strpcpy(sj->empty = p,     empty);
+    if (prefix)    sj->prefix.length    = strlen(prefix),    p = strpcpy(sj->prefix.string = p,    prefix);
+    if (delimiter) sj->delimiter.length = strlen(delimiter), p = strpcpy(sj->delimiter.string = p, delimiter);
+    if (suffix)    sj->suffix.length    = strlen(suffix),    p = strpcpy(sj->suffix.string = p,    suffix);
+    if (empty)     sj->empty.length     = strlen(empty),     p = strpcpy(sj->empty.string = p,     empty);
     return sj;
   }
   return NULL;
@@ -75,23 +71,29 @@ stringjoiner_destroy(stringjoiner *sj) {
   free(sj);
 }
 
+static char * //this just looks cool
+stringjoiner_set_suffix_or_empty_added(stringjoiner *sj, char *string) {
+  return sj->suffix_or_empty_added.length = string ? strlen(string) : 0,
+         sj->suffix_or_empty_added.string = string; }
+
 void
 stringjoiner_reset(stringjoiner *sj) {
   sj->count = 0;
-  sj->suffix_or_empty_added = NULL;
+  stringjoiner_set_suffix_or_empty_added(sj, NULL);
   stringbuilder_reset(&sj->sb);
 }
 
 size_t
 stringjoiner_length(stringjoiner *sj) {
   return stringbuilder_length(&sj->sb) + 
-    (sj->suffix_or_empty_added ? 0 : sj->count ? sj->length_suffix : sj->length_empty);
+    (sj->suffix_or_empty_added.string ? 0 : sj->count ? sj->suffix.length : sj->empty.length);
 }
 
 const char *
 stringjoiner_string(stringjoiner *sj) {
-  if (!sj->suffix_or_empty_added && (sj->suffix_or_empty_added = sj->count ? sj->suffix : sj->empty))
-    stringbuilder_append(&sj->sb, sj->suffix_or_empty_added);
+  if (!sj->suffix_or_empty_added.string
+   && stringjoiner_set_suffix_or_empty_added(sj, sj->count ? sj->suffix.string : sj->empty.string))
+    stringbuilder_append(&sj->sb, sj->suffix_or_empty_added.string);
   return stringbuilder_string(&sj->sb);
 }
 
@@ -103,12 +105,12 @@ stringjoiner_to_string(stringjoiner *sj) {
 
 bool
 stringjoiner_add(stringjoiner *sj, const char *string) {
-  if (sj->suffix_or_empty_added) {
-    stringbuilder_set_length(&sj->sb, stringbuilder_length(&sj->sb) - strlen(sj->suffix_or_empty_added));
-    sj->suffix_or_empty_added = NULL;
+  if (sj->suffix_or_empty_added.string) {
+    stringbuilder_set_length(&sj->sb, stringbuilder_length(&sj->sb) - sj->suffix_or_empty_added.length);
+    stringjoiner_set_suffix_or_empty_added(sj, NULL);
   }
   const size_t length = stringbuilder_length(&sj->sb);
-  char *str_to_add = sj->count ? sj->delimiter : sj->prefix;
+  char *str_to_add = sj->count ? sj->delimiter.string : sj->prefix.string;
   if (str_to_add && !stringbuilder_append(&sj->sb, str_to_add))
     goto fail;
   if (stringbuilder_append(&sj->sb, string)) {
@@ -126,15 +128,15 @@ stringjoiner_addf(stringjoiner *sj, const char *format, ...) {
   va_list args;
   char buffer[0x2000];
   va_start(args, format);
-  int printed = vsnprintf(buffer, sizeof buffer - 1, format, args);
+  int printed = vsnprintf(buffer, sizeof buffer, format, args);
   va_end(args);
   if (printed < 0) {
     return false;
-  } else if ((size_t)printed < sizeof buffer - 1) {
+  } else if ((size_t)printed < sizeof buffer) {
     buffer[printed] = '\0';
     return stringjoiner_add(sj, buffer);
   } else {
-    char *string = malloc((printed + 10) * sizeof *string);
+    char *string = malloc((printed + 1) * sizeof *string);
     if (string) {
       va_start(args, format);
       printed = vsnprintf(string, printed + 1, format, args);
