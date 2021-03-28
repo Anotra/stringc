@@ -49,7 +49,7 @@ stringbuilder_destroy(stringbuilder *sb) {
 
 static bool
 increase_size(stringbuilder *sb, size_t space_needed) {
-  size_t new_capacity = 0x10;
+  size_t new_capacity = 0x100;
   for (; new_capacity - 1 < space_needed; new_capacity <<= 1)
     if (!new_capacity) return false;
   if (sb->capacity_max && new_capacity - 1 > sb->capacity_max) {
@@ -57,7 +57,8 @@ increase_size(stringbuilder *sb, size_t space_needed) {
       new_capacity = sb->capacity_max + 1;
     } else return false;
   }
-  void *tmp = sb->string ? realloc(sb->string, new_capacity * sizeof *sb->string) : calloc(new_capacity, sizeof *sb->string);
+  void *tmp = sb->string ? realloc(sb->string, new_capacity * sizeof *sb->string) 
+                         : calloc(new_capacity, sizeof *sb->string);
   if (tmp) {
     sb->capacity = new_capacity - 1;
     sb->string = tmp;
