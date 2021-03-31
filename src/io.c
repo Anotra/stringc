@@ -30,7 +30,7 @@ int
 fgets_line(char **line, size_t *capacity, size_t max_capacity, FILE *stream) {
   //TODO: implement max_capacity
   if (!*line && !(*line = malloc(*capacity = 64)))
-    return *capacity = 0, -1;
+    return *capacity = 0, 1;
   (*line)[0] = 0;
   char *position = *line;
   while (1) {
@@ -45,14 +45,14 @@ fgets_line(char **line, size_t *capacity, size_t max_capacity, FILE *stream) {
           position = tmp + *capacity - 1;
           *line = tmp;
           *capacity = new_capacity;
-        } else return -1;
+        } else return 1;
       } else goto success;
     } else if (position != *line) {
       if (feof(stream))
         goto success;
-      return -1;
-    } else return 0;
+      return 1;
+    } else return -1;
   }
   success:
-  return 1;
+  return 0;
 }

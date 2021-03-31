@@ -232,13 +232,12 @@ stringbuilder_string(stringbuilder *sb) {
   return sb->string;
 }
 
-size_t
+bool
 stringbuilder_append_fgets(stringbuilder *sb, FILE *file) {
   switch (fgets_line(&sb->fgets_string.string, &sb->fgets_string.capacity, 
                       sb->capacity_max ? sb->capacity_max - sb->length : SIZE_MAX, file)) {
-    case 1:   stringbuilder_appendl(sb, sb->fgets_string.string, sb->fgets_string.length);
-              //fallthru
-    case 0:   return sb->fgets_string.length;
-    default:  return 0;
+    case 0:   return stringbuilder_appendl(sb, sb->fgets_string.string, sb->fgets_string.length);
+    case -1:  //fallthru
+    default:  return false;
   }
 }

@@ -43,8 +43,8 @@ Output
 #### read line from file into stringbuilder
 ```c
   stringbuilder *sb = stringbuilder_create();
-  for (size_t count; (count = stringbuilder_append_fgets(sb, stdin)); stringbuilder_reset(sb))
-    printf("%zu> %s", count, stringbuilder_string(sb));
+  for (;stringbuilder_append_fgets(sb, stdin); stringbuilder_reset(sb))
+    puts(stringbuilder_string(sb));
   stringbuilder_destroy(sb);
 ```
 ### [stringc/stringjoiner.h](https://github.com/Anotra/stringc/blob/main/include/stringc/stringjoiner.h)
