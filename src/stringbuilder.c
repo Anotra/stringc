@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "stringbuilder.h"
@@ -233,7 +234,8 @@ stringbuilder_string(stringbuilder *sb) {
 
 size_t
 stringbuilder_append_fgets(stringbuilder *sb, FILE *file) {
-  switch (fgets_line(&sb->fgets_string.string, &sb->fgets_string.capacity, &sb->fgets_string.length, file)) {
+  switch (fgets_line(&sb->fgets_string.string, &sb->fgets_string.capacity, 
+                      sb->capacity_max ? sb->capacity_max - sb->length : SIZE_MAX, file)) {
     case 1:   stringbuilder_appendl(sb, sb->fgets_string.string, sb->fgets_string.length);
               //fallthru
     case 0:   return sb->fgets_string.length;

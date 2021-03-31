@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-int fgets_line(char **line, size_t *capacity, size_t *length, FILE *stream);
+int fgets_line(char **line, size_t *capacity, size_t max_capacity, FILE *stream);
 
 #ifdef __cplusplus
 }

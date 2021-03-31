@@ -27,12 +27,11 @@
 #include "stringc/io.h"
 
 int
-fgets_line(char **line, size_t *capacity, size_t *length, FILE *stream) {
+fgets_line(char **line, size_t *capacity, size_t max_capacity, FILE *stream) {
+  //TODO: implement max_capacity
   if (!*line && !(*line = malloc(*capacity = 64)))
     return *capacity = 0, -1;
   (*line)[0] = 0;
-  if (length)
-    *length = 0;
   char *position = *line;
   while (1) {
     (*line)[*capacity - 1] = 1;
@@ -55,7 +54,5 @@ fgets_line(char **line, size_t *capacity, size_t *length, FILE *stream) {
     } else return 0;
   }
   success:
-  if (length)
-    *length = position - *line + strlen(position);
   return 1;
 }
