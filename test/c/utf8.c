@@ -1,4 +1,5 @@
 
+#include <stdio.h>
 #include <stringc/string.h>
 
 int main() {
@@ -14,6 +15,6 @@ int main() {
      || utf8decode(&dec, 0, 0) != i % 437
      || utf8decode(&dec, 0, 0) != i * 3
      || utf8decode(&dec, 0, 0) != i)
-      return 1;
+      return printf("utf8 enc/dec %i\n", i), 1;
   }
 }

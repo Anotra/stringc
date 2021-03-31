@@ -26,20 +26,17 @@ int main() {
   char *decode2 = base64decodes(text_encoded2, 0, 0, 0, 0);
 
   int result = 0;
-  if (strcmp(text, decode) != 0) {
-    puts("base64 decode failed");
-    result = 1;
-  }
+  if (strcmp(text, decode) != 0)
+    puts("base64 decode failed"), result = 1;
+  
 
-  if (strcmp(text, decode2) != 0) {
-    puts("base64 decode with spaces and extra paddingfailed");
-    result = 1;
-  }
+  if (strcmp(text, decode2) != 0)
+    puts("base64 decode with spaces and extra paddingfailed"), result = 1;
+  
 
-  if (strcmp(text_encoded, encode) != 0) {
-    puts("base64 encode failed");
-    result = 1;
-  }
+  if (strcmp(text_encoded, encode) != 0)
+    puts("base64 encode failed"), result = 1;
+  
 
   free(encode);
   free(decode);
