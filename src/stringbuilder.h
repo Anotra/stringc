@@ -33,11 +33,6 @@ struct stringbuilder {
   size_t capacity_max;
   char *string;
   bool free_on_destroy;
-  struct {
-    char *string;
-    size_t capacity;
-    size_t length;
-  } fgets_string;
 };
 
 #endif//STRINGC_STRINGBUILDER_INTERNAL_H

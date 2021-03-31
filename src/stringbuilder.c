@@ -42,7 +42,6 @@ void
 stringbuilder_destroy(stringbuilder *sb) {
   bool free_on_destroy = sb->free_on_destroy;
   free(sb->string);
-  free(sb->fgets_string.string);
   memset(sb, 0, sizeof *sb);
   if (free_on_destroy)
     free(sb);
@@ -230,14 +229,4 @@ const char *
 stringbuilder_string(stringbuilder *sb) {
   ensure_space(sb, 0);
   return sb->string;
-}
-
-bool
-stringbuilder_append_fgets(stringbuilder *sb, FILE *file) {
-  switch (fgets_line(&sb->fgets_string.string, &sb->fgets_string.capacity, 
-                      sb->capacity_max ? sb->capacity_max - sb->length : SIZE_MAX, file)) {
-    case 0:   return stringbuilder_appendl(sb, sb->fgets_string.string, sb->fgets_string.length);
-    case -1:  //fallthru
-    default:  return false;
-  }
 }

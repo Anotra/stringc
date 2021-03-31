@@ -58,7 +58,6 @@ bool         stringbuilder_append(stringbuilder *sb, const char *string);
 bool         stringbuilder_appendl(stringbuilder *sb, const char *string, const size_t length);
 bool         stringbuilder_appendf(stringbuilder *sb, const char *format, ...);
 bool         stringbuilder_append_sb(stringbuilder *dest, const stringbuilder *src);
-bool         stringbuilder_append_fgets(stringbuilder *sb, FILE *file);
 
 #ifdef __cplusplus
 }

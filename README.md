@@ -40,13 +40,6 @@ Output
   printf("%s", stringbuilder_string(sb));
   stringbuilder_destroy(sb);
 ```
-#### read line from file into stringbuilder
-```c
-  stringbuilder *sb = stringbuilder_create();
-  for (;stringbuilder_append_fgets(sb, stdin); stringbuilder_reset(sb))
-    puts(stringbuilder_string(sb));
-  stringbuilder_destroy(sb);
-```
 ### [stringc/stringjoiner.h](https://github.com/Anotra/stringc/blob/main/include/stringc/stringjoiner.h)
 ```c
   stringjoiner *sj = stringjoiner_create("[", ", ", "]", "[]");
