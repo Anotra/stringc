@@ -25,11 +25,14 @@
 #ifndef STRINGC_BASE64_H
 #define STRINGC_BASE64_H
 
-#include <stdlib.h>
-#include <inttypes.h>
 
 #ifdef __cplusplus
+#include <cstdlib>
+#include <cinttypes>
 extern "C" {
+#else
+#include <stdlib.h>
+#include <inttypes.h>
 #endif
 
 typedef struct base64digits 

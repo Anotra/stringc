@@ -25,10 +25,11 @@
 #ifndef STRINGC_STRINGJOINER_H
 #define STRINGC_STRINGJOINER_H
 
-#include <stdbool.h>
-
 #ifdef __cplusplus
+#include <cstdbool>
 extern "C" {
+#else
+#include <stdbool.h>
 #endif
 
 typedef struct stringjoiner stringjoiner;

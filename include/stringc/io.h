@@ -25,11 +25,14 @@
 #ifndef STRINGC_IO_H
 #define STRINGC_IO_H
 
-#include <stdlib.h>
-#include <stdio.h>
 
 #ifdef __cplusplus
+#include <cstdlib>
+#include <cstdio>
 extern "C" {
+#else
+#include <stdlib.h>
+#include <stdio.h>
 #endif
 
 int fgets_line(char **line, size_t *capacity, size_t max_capacity, FILE *stream);

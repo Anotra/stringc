@@ -25,12 +25,15 @@
 #ifndef STRINGC_STRING_H
 #define STRINGC_STRING_H
 
+#ifdef __cplusplus
+#include <cstring>
+#include <cstdbool>
+#include <cinttypes>
+extern "C" {
+#else
 #include <string.h>
 #include <stdbool.h>
 #include <inttypes.h>
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 char *  strduplen(const char *const src, size_t *const length);

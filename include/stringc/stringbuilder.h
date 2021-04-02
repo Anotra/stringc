@@ -25,11 +25,14 @@
 #ifndef STRINGC_STRINGBUILDER_H
 #define STRINGC_STRINGBUILDER_H
 
-#include <stdio.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
+#include <cstdio>
+#include <cstdbool>
 extern "C" {
+#else
+#include <stdio.h>
+#include <stdbool.h>
 #endif
 
 typedef struct stringbuilder stringbuilder;
