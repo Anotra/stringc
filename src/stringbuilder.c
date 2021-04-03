@@ -29,7 +29,6 @@
 #include <string.h>
 
 #include "stringbuilder.h"
-#include "stringc/io.h"
 
 stringbuilder *
 stringbuilder_create(void) {

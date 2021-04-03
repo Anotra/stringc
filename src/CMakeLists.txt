@@ -2,7 +2,6 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/string.c
     ${CMAKE_CURRENT_LIST_DIR}/stringbuilder.c
     ${CMAKE_CURRENT_LIST_DIR}/stringjoiner.c
-    ${CMAKE_CURRENT_LIST_DIR}/io.c
 
     ${CMAKE_CURRENT_LIST_DIR}/charset/utf8.c
 
