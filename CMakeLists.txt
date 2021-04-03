@@ -28,6 +28,8 @@ if (CMAKE_CXX_COMPILER)
     endif()
 endif()
 
+option(BUILD_TESTS "Build Test Files" ON)
+
 project(stringc)
 add_library(${PROJECT_NAME} SHARED)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
@@ -38,5 +40,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 add_subdirectory(src)
 
-enable_testing()
-add_subdirectory(test)
+if (BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
