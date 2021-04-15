@@ -14,8 +14,8 @@
   const char *string = "Hello World!!";
   char encoded[64], decoded[64];
   size_t encoded_len, decoded_len;
-  base64encodes(string, 0, encoded, sizeof encoded, &encoded_len);
-  base64decodes(encoded, 0, decoded,sizeof decoded, &decoded_len);
+  base64encodes(encoded, sizeof encoded, &encoded_len, string, 0);
+  base64decodes(decoded, sizeof decoded, &decoded_len, encoded, 0);
   printf(
     "%s\n%s\n%s\n"
     "String Length: %zu\nEncoding Length: %zu\nsuccess: %c\n", 

@@ -30,13 +30,13 @@
 #define STRINGC_BASE64_PRIVATE
 #include "stringc/base64.h"
 
-struct base64digits {
+struct base64 {
   uint8_t characters[128];
   uint8_t decode_table[256];
   uint8_t padding[128];
 };
 
-static const base64digits default_base64_characters = {
+static const base64 default_base64_characters = {
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
   {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
@@ -58,8 +58,8 @@ static const base64digits default_base64_characters = {
   }, {0}
 };
 
-base64digits *
-base64digits_init(base64digits *digits, const char *characters) {
+base64 *
+base64init(base64 *digits, const char *characters) {
   memset(digits, 0, sizeof *digits);
   memset(digits->decode_table, 0xFF, sizeof digits->decode_table);
   const size_t len = characters ? strlen(characters) : 0;
@@ -85,11 +85,11 @@ base64digits_init(base64digits *digits, const char *characters) {
   return digits;
 }
 
-base64digits *
-base64digits_create(const char *characters) {
-  base64digits *digits = malloc(sizeof *digits);
+base64 *
+base64create(const char *characters) {
+  base64 *digits = malloc(sizeof *digits);
   if (digits) {
-    base64digits *ret = base64digits_init(digits, characters);
+    base64 *ret = base64init(digits, characters);
     if (!ret) {
       free(digits);
       return NULL;
@@ -109,7 +109,7 @@ base64decodelen(size_t len) {
 }
 
 char *
-base64encode_ex(const base64digits *digits, const void *in_buf, size_t in_size, char *out, size_t out_size, size_t *out_len) {
+base64encode_ex(const base64 *digits, char *out, size_t out_size, size_t *out_len, const void *in_buf, size_t in_size) {
   const uint8_t *base64characters = digits->characters;
   const uint8_t *in = in_buf;
   const int free_ret_on_fail = !out;
@@ -155,7 +155,7 @@ base64encode_ex(const base64digits *digits, const void *in_buf, size_t in_size, 
 }
 
 static void
-base64decode_fast(const base64digits *digits, size_t *in_size, size_t *out_size, uint8_t **in, uint8_t **out) {
+base64decode_fast(const base64 *digits, uint8_t **out, size_t *out_size, uint8_t **in, size_t *in_size) {
   const uint8_t *base64decode_table = digits->decode_table;
   while (*in_size >= 12 && *out_size >= 9) {
     uint8_t error = 0;
@@ -182,7 +182,7 @@ base64decode_fast(const base64digits *digits, size_t *in_size, size_t *out_size,
 }
 
 static bool
-base64decode_tolerant(const base64digits *digits, size_t *in_size, size_t *out_size, uint8_t **in, uint8_t **out) {
+base64decode_tolerant(const base64 *digits, uint8_t **out, size_t *out_size, uint8_t **in, size_t *in_size) {
   const uint8_t *base64decode_table = digits->decode_table;
   const uint8_t base64_padding_character = digits->characters[64];
   for (uint8_t padding = 0; *in_size; padding = 0) {
@@ -235,7 +235,7 @@ base64decode_tolerant(const base64digits *digits, size_t *in_size, size_t *out_s
 }
 
 void *
-base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void *out_buf, size_t out_size, size_t *out_len) {
+base64decode_ex(const base64 *digits, void *out_buf, size_t out_size, size_t *out_len, const char *in, size_t in_size) {
   uint8_t *out = out_buf;
   const int free_ret_on_fail = !out;
   if (!in_size)
@@ -246,9 +246,8 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
       return NULL;
   }
   uint8_t *const ret = out;
-  base64decode_fast(digits, &in_size, &out_size, (uint8_t **)&in, &out);
-  base64decode_tolerant(digits, &in_size, &out_size, (uint8_t **)&in, &out);
-
+  base64decode_fast(digits, &out, &out_size, (uint8_t **)&in, &in_size);
+  base64decode_tolerant(digits, &out, &out_size, (uint8_t **)&in, &in_size);
   if (in_size) {
     if (free_ret_on_fail)
       free(ret);
@@ -262,7 +261,7 @@ base64decode_ex(const base64digits *digits, const char *in, size_t in_size, void
 }
 
 char *
-base64encodes_ex(const base64digits *digits, const void *in, size_t in_size, char *out, size_t out_size, size_t *out_len) {
+base64encodes_ex(const base64 *digits, char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size) {
   if (!in_size) in_size = strlen(in);
   if (!out) {
     out_size = base64encodelen(in_size) + 1;
@@ -272,7 +271,7 @@ base64encodes_ex(const base64digits *digits, const void *in, size_t in_size, cha
     return NULL;
   }
   size_t encoded_len;
-  char *encoded = base64encode_ex(digits, in, in_size, out, out_size - 1, &encoded_len);
+  char *encoded = base64encode_ex(digits, out, out_size - 1, &encoded_len, in, in_size);
   if (encoded)
     encoded[encoded_len] = 0;
   if (out_len)
@@ -281,7 +280,7 @@ base64encodes_ex(const base64digits *digits, const void *in, size_t in_size, cha
 }
 
 char *
-base64decodes_ex(const base64digits *digits, const char *in, size_t in_size, void *out, size_t out_size, size_t *out_len) {
+base64decodes_ex(const base64 *digits, void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size) {
   if (!in_size) in_size = strlen(in);
   if (!out) {
     out_size = base64decodelen(in_size) + 1;
@@ -291,7 +290,7 @@ base64decodes_ex(const base64digits *digits, const char *in, size_t in_size, voi
     return NULL;
   }
   size_t decoded_len;
-  char *decoded = base64decode_ex(digits, in, in_size, out, out_size - 1, &decoded_len);
+  char *decoded = base64decode_ex(digits, out, out_size - 1, &decoded_len, in, in_size);
   if (decoded)
     decoded[decoded_len] = 0;
   if (out_len)
@@ -301,21 +300,21 @@ base64decodes_ex(const base64digits *digits, const char *in, size_t in_size, voi
 }
 
 char *
-base64encode(const void *in, size_t in_size, char *out, size_t out_size, size_t *out_len) {
-  return base64encode_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
+base64encode(char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size) {
+  return base64encode_ex(&default_base64_characters, out, out_size, out_len, in, in_size);
 }
 
 void *
-base64decode(const char *in, size_t in_size, void *out, size_t out_size, size_t *out_len) {
-  return base64decode_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
+base64decode(void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size) {
+  return base64decode_ex(&default_base64_characters, out, out_size, out_len, in, in_size);
 }
 
 char *
-base64encodes(const void *in, size_t in_size, char *out, size_t out_size, size_t *out_len) {
-  return base64encodes_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
+base64encodes(char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size) {
+  return base64encodes_ex(&default_base64_characters, out, out_size, out_len, in, in_size);
 }
 
 char *
-base64decodes(const char *in, size_t in_size, void *out, size_t out_size, size_t *out_len) {
-  return base64decodes_ex(&default_base64_characters, in, in_size, out, out_size, out_len);
+base64decodes(void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size) {
+  return base64decodes_ex(&default_base64_characters, out, out_size, out_len, in, in_size);
 }

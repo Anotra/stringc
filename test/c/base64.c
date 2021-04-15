@@ -21,9 +21,9 @@ int main() {
     "dWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRo"
     "ZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3Vy=======ZS4=======";
 
-  char *encode = base64encodes(text, 0, 0, 0, 0);
-  char *decode = base64decodes(text_encoded, 0, 0, 0, 0);
-  char *decode2 = base64decodes(text_encoded2, 0, 0, 0, 0);
+  char *encode = base64encodes(0, 0, 0, text, 0);
+  char *decode = base64decodes(0, 0, 0, text_encoded, 0);
+  char *decode2 = base64decodes(0, 0, 0, text_encoded2, 0);
 
   int result = 0;
   if (strcmp(text, decode) != 0)
