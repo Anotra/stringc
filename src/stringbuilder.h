@@ -36,3 +36,4 @@ struct stringbuilder {
 };
 
 #endif//STRINGC_STRINGBUILDER_INTERNAL_H
+

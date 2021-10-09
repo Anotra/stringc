@@ -58,3 +58,4 @@ char * base64decodes_ex(const base64 *digits, void *out, size_t out_size, size_t
 #endif
 
 #endif//STRINGC_BASE64_H
+

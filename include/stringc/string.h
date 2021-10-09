@@ -49,3 +49,4 @@ bool    utf8encode(char **buf, const char *end, const int32_t codepoint, size_t 
 #endif
 
 #endif//STRINGC_STRING_H
+

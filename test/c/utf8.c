@@ -18,3 +18,4 @@ int main() {
       return printf("utf8 enc/dec %i\n", i), 1;
   }
 }
+

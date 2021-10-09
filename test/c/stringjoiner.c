@@ -42,3 +42,4 @@ int main() {
   stringjoiner_destroy(sj);
   return result;
 }
+

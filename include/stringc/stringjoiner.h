@@ -55,3 +55,4 @@ bool           stringjoiner_addf(stringjoiner *sj, const char *format, ...);
 #endif
 
 #endif//STRINGC_STRINGJOINER_H
+

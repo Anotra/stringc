@@ -67,3 +67,4 @@ bool         stringbuilder_append_sb(stringbuilder *dest, const stringbuilder *s
 #endif
 
 #endif//STRINGC_STRINGBUILDER_H
+

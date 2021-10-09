@@ -318,3 +318,4 @@ char *
 base64decodes(void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size) {
   return base64decodes_ex(&default_base64_characters, out, out_size, out_len, in, in_size);
 }
+

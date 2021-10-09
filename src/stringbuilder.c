@@ -229,3 +229,4 @@ stringbuilder_string(stringbuilder *sb) {
   ensure_space(sb, 0);
   return sb->string;
 }
+

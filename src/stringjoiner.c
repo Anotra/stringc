@@ -149,3 +149,4 @@ stringjoiner_addf(stringjoiner *sj, const char *format, ...) {
   }
   return false;
 }
+
