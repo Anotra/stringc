@@ -47,5 +47,5 @@ endif()
 
 install(TARGETS stringc LIBRARY DESTINATION lib)
 install(TARGETS stringc_static LIBRARY DESTINATION lib)
-file(GLOB_RECURSE STRINGC_PUBLIC_INCLUDE_FILES include/stringc/*.h)
+file(GLOB STRINGC_PUBLIC_INCLUDE_FILES include/stringc/*.h)
 install(FILES ${STRINGC_PUBLIC_INCLUDE_FILES} DESTINATION include/stringc)
