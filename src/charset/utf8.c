@@ -81,7 +81,8 @@ utf8decode(const char **str, const char *end, bool reset_ptr_on_fail) {
           codepoint |= *(*str)++ & 0x3F;
         } else goto fail;
       }
-      return shifted > 5 ? -1 : ((first & 0x3F) << (6 * shifted - shifted)) | codepoint;
+      if (shifted < 6)
+        return ((first & 0x3F) << (6 * shifted - shifted)) | codepoint;
     } else goto fail;
   } else return first;
 
