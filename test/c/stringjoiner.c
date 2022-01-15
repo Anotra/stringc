@@ -4,7 +4,9 @@
 #include <string.h>
 #include <stringc/stringjoiner.h>
 
-int main() {
+#include "testing.h"
+
+int test_stringjoiner() {
   int result = 0;
   stringjoiner *sj = stringjoiner_create("[ ", ", ", " ]", "[]");
   if (strcmp(stringjoiner_string(sj), "[]") != 0)
@@ -42,4 +44,3 @@ int main() {
   stringjoiner_destroy(sj);
   return result;
 }
-

@@ -2,7 +2,9 @@
 #include <string.h>
 #include <stringc/base64.h>
 
-int main() {
+#include "testing.h"
+
+int test_base64() {
   const char *text =
     "Man is distinguished, not only by his reason, but by this singular passion from other animals, "
     "which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable "
@@ -43,4 +45,3 @@ int main() {
   free(decode2);
   return result;
 }
-

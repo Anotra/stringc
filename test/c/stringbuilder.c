@@ -4,7 +4,9 @@
 #include <string.h>
 #include <stringc/stringbuilder.h>
 
-int main() {
+#include "testing.h"
+
+int test_stringbuilder() {
   int result = 0;
   const char *hello_world = "Hello World!";
   stringbuilder *sb = stringbuilder_create();
@@ -36,4 +38,3 @@ int main() {
 
   return result;
 }
-

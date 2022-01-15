@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stringc/string.h>
 
-int main() {
+#include "testing.h"
+
+int test_utf8() {
   char buf[64];
   for (int i=1; i<10000000; i++) {
     char *enc = buf;
@@ -17,5 +19,5 @@ int main() {
      || utf8decode(&dec, 0, 0) != i)
       return printf("utf8 enc/dec %i\n", i), 1;
   }
+  return 0;
 }
-
