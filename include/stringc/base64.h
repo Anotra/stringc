@@ -25,7 +25,6 @@
 #ifndef STRINGC_BASE64_H
 #define STRINGC_BASE64_H
 
-
 #ifdef __cplusplus
 #include <cstdlib>
 #include <cinttypes>
@@ -35,23 +34,25 @@ extern "C" {
 #include <inttypes.h>
 #endif
 
+#include "export.h"
+
 typedef struct base64 
 #ifndef STRINGC_BASE64_PRIVATE
 { const uint8_t _private[512]; }
 #endif
 base64;
 
-base64 * base64init(base64 *digits, const char *characters);
-base64 * base64create(              const char *characters);
+STRINGC_EXPORT base64 * base64init(base64 *digits, const char *characters);
+STRINGC_EXPORT base64 * base64create(              const char *characters);
 
-char * base64encode    (                      char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
-void * base64decode    (                      void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
-char * base64encodes   (                      char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
-char * base64decodes   (                      void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
-char * base64encode_ex (const base64 *digits, char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
-void * base64decode_ex (const base64 *digits, void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
-char * base64encodes_ex(const base64 *digits, char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
-char * base64decodes_ex(const base64 *digits, void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
+STRINGC_EXPORT char * base64encode    (                      char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
+STRINGC_EXPORT void * base64decode    (                      void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
+STRINGC_EXPORT char * base64encodes   (                      char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
+STRINGC_EXPORT char * base64decodes   (                      void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
+STRINGC_EXPORT char * base64encode_ex (const base64 *digits, char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
+STRINGC_EXPORT void * base64decode_ex (const base64 *digits, void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
+STRINGC_EXPORT char * base64encodes_ex(const base64 *digits, char *out, size_t out_size, size_t *out_len, const void *in, size_t in_size);
+STRINGC_EXPORT char * base64decodes_ex(const base64 *digits, void *out, size_t out_size, size_t *out_len, const char *in, size_t in_size);
 
 #ifdef __cplusplus
 }

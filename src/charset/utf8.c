@@ -61,12 +61,9 @@ int32_t
 utf8decode(const char **str, const char *end, bool reset_ptr_on_fail) {
   const char *const begin = *str;
   if (end && *str >= end) {
-    if (*str == end) {
+    if (*str == end)
       return 0;
-    } else {
-      errno = ENOBUFS;
-      return -1;
-    }
+    return errno = ENOBUFS, -1;
   }
   int32_t first = *(*str)++;
   if (first & 0x80) { //UTF-8
@@ -89,8 +86,7 @@ utf8decode(const char **str, const char *end, bool reset_ptr_on_fail) {
   fail:
   if (reset_ptr_on_fail)
     *str = begin;
-  errno = EILSEQ;
-  return -1;
+  return errno = EILSEQ, -1;
 }
 
 bool
@@ -98,17 +94,15 @@ utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_si
   size_t bytes_needed = 1;
   if ((codepoint & 0x7F) == codepoint) { //ASCII
     if (utf8_size) *utf8_size = bytes_needed;
-    if (!buf || (end && (*buf + bytes_needed) > end)) {
-      errno = ENOBUFS;
-      return false;
-    }
+    if (!buf || (end && (*buf + bytes_needed) > end))
+      return errno = ENOBUFS, false;
+
     //nothing to compute. insert ascii into buffer
     *(*buf)++ = codepoint;
     return true;
   } else if (codepoint < 0) {            //invalid codepoint
     if (utf8_size) *utf8_size = 0;
-    errno = EILSEQ;
-    return false;
+    return errno = EILSEQ, false;
   } else {                               //UTF8
     int32_t mask = 0, cp = 0;
 
@@ -117,10 +111,8 @@ utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_si
       bytes_needed++;
 
     if (utf8_size) *utf8_size = bytes_needed;
-    if (!buf || (end && (*buf + bytes_needed) > end)) {
-      errno = ENOBUFS;
-      return false;
-    }
+    if (!buf || (end && (*buf + bytes_needed) > end))
+      return errno = ENOBUFS, false;
     
     //begin inserting utf8 chars
     char *tmp = (*buf += bytes_needed);

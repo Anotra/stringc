@@ -32,23 +32,25 @@ extern "C" {
 #include <stdbool.h>
 #endif
 
+#include "export.h"
+
 typedef struct stringjoiner stringjoiner;
 
-stringjoiner * stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty);
-void           stringjoiner_destroy(stringjoiner *sj);
-void           stringjoiner_reset(stringjoiner *sj);
+STRINGC_EXPORT stringjoiner * stringjoiner_create(const char *prefix, const char *delimiter, const char *suffix, const char *empty);
+STRINGC_EXPORT void           stringjoiner_destroy(stringjoiner *sj);
+STRINGC_EXPORT void           stringjoiner_reset(stringjoiner *sj);
 
-size_t         stringjoiner_length(stringjoiner *sj);
+STRINGC_EXPORT size_t         stringjoiner_length(stringjoiner *sj);
 
 /**
  * this pointer should be discarded after any changes made to the stringjoiner
  * @return internal string
  */
-const char *   stringjoiner_string(stringjoiner *sj);
-char *         stringjoiner_to_string(stringjoiner *sj);
+STRINGC_EXPORT const char *   stringjoiner_string(stringjoiner *sj);
+STRINGC_EXPORT char *         stringjoiner_to_string(stringjoiner *sj);
 
-bool           stringjoiner_add(stringjoiner *sj, const char *string);
-bool           stringjoiner_addf(stringjoiner *sj, const char *format, ...);
+STRINGC_EXPORT bool           stringjoiner_add(stringjoiner *sj, const char *string);
+STRINGC_EXPORT bool           stringjoiner_addf(stringjoiner *sj, const char *format, ...);
 
 #ifdef __cplusplus
 }

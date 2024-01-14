@@ -1,3 +1,6 @@
+# generated files
+include/stringc/export.h
+
 build/
 out/
 

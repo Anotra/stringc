@@ -36,13 +36,15 @@ extern "C" {
 #include <inttypes.h>
 #endif
 
-char *  strduplen(const char *const src, size_t *const length);
+#include "export.h"
+
+STRINGC_EXPORT char *  strduplen(const char *const src, size_t *const length);
 
 //UTF8
-size_t  utf8len(const char *str, const char *end);
-bool    utf8validate(const char *str, const char *end, size_t *length) ;
-int32_t utf8decode(const char **str, const char *end, bool reset_ptr_on_fail);
-bool    utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_size);
+STRINGC_EXPORT size_t  utf8len(const char *str, const char *end);
+STRINGC_EXPORT bool    utf8validate(const char *str, const char *end, size_t *length) ;
+STRINGC_EXPORT int32_t utf8decode(const char **str, const char *end, bool reset_ptr_on_fail);
+STRINGC_EXPORT bool    utf8encode(char **buf, const char *end, const int32_t codepoint, size_t *utf8_size);
 
 #ifdef __cplusplus
 }
